@@ -550,7 +550,7 @@ c     | in span(A) orthogonal to U(:,1:j), so we can   |
 c     | continue the LBD and "deflate" the subspace by |
 c     | setting beta_{j+1} = 0.                        |
 c     %------------------------------------------------%
-               call ssafescal(n,beta,U(1,j+1))
+               call ssafescal(m,beta,U(1,j+1))
                beta = zero
                force_reorth = .true.
                if (delta .gt. zero) then
