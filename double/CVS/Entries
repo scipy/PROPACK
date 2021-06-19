@@ -1,0 +1,18 @@
+/Makefile/1.4/Tue Mar 23 00:28:13 2004//
+/dblasext.F/1.2/Wed Mar 10 22:06:22 2004//
+/dbsvd.F/1.1.1.1/Sat Mar  6 02:11:35 2004//
+/dgemm_ovwr.F/1.1.1.1/Sat Mar  6 02:11:35 2004//
+/dgetu0.F/1.1.1.1/Sat Mar  6 02:11:35 2004//
+/dlansvd.F/1.1.1.1/Sat Mar  6 02:11:35 2004//
+/dlansvd_irl.F/1.1.1.1/Sat Mar  6 02:11:35 2004//
+/dmgs.pentium.F/1.1.1.1/Sat Mar  6 02:11:35 2004//
+/dmgs.risc.F/1.2/Wed Mar 10 22:06:23 2004//
+/dreorth.F/1.1.1.1/Sat Mar  6 02:11:35 2004//
+/dritzvec.F/1.1.1.1/Sat Mar  6 02:11:35 2004//
+/dsafescal.F/1.1.1.1/Sat Mar  6 02:11:35 2004//
+/printstat.F/1.1.1.1/Sat Mar  6 02:11:35 2004//
+/second.F/1.1/Tue Mar 23 00:33:50 2004//
+/stat.h/1.1.1.1/Sat Mar  6 02:11:35 2004//
+D/Examples////
+D/Lapack_Util////
+/dlanbpro.F/1.2/Wed Apr 20 18:00:36 2005//

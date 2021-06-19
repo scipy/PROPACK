@@ -1,0 +1,21 @@
+/Makefile/1.4/Tue Mar 23 00:28:12 2004//
+/dblasext.F/1.2/Wed Mar 10 22:06:21 2004//
+/dbsvd.F/1.1.1.1/Sat Mar  6 02:11:36 2004//
+/dgemm_ovwr.F/1.1.1.1/Sat Mar  6 02:11:36 2004//
+/dmgs.pentium.F/1.1.1.1/Sat Mar  6 02:11:36 2004//
+/printstat.F/1.1.1.1/Sat Mar  6 02:11:36 2004//
+/second.F/1.1/Tue Mar 23 00:33:48 2004//
+/stat.h/1.1.1.1/Sat Mar  6 02:11:36 2004//
+/zblasext.F/1.5/Tue Mar 23 00:28:12 2004//
+/zgemm_ovwr.F/1.3/Thu Mar 18 01:26:38 2004//
+/zgetu0.F/1.2/Thu Mar 18 01:26:39 2004//
+/zlansvd.F/1.2/Thu Mar 18 01:26:39 2004//
+/zlansvd_irl.F/1.2/Thu Mar 18 01:26:39 2004//
+/zmgs.pentium.F/1.2/Thu Mar 18 01:26:39 2004//
+/zmgs.risc.F/1.3/Thu Mar 18 01:26:39 2004//
+/zreorth.F/1.2/Thu Mar 18 01:26:39 2004//
+/zritzvec.F/1.3/Thu Mar 18 01:26:39 2004//
+/zsafescal.F/1.2/Thu Mar 18 01:26:39 2004//
+D/Examples////
+D/Lapack_Util////
+/zlanbpro.F/1.3/Wed Apr 20 17:57:52 2005//
