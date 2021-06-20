@@ -169,8 +169,8 @@ c         print *,((U(i,j),i=1,m),j=1,dim+1)
 c         print *,'X = '
 c         print *,(work(imt+i-1),i=1,(dim+1)*k)
 
-c$OMP PARALLEL private(tid,nt,cnk,st,wcnk,wst) 
 #ifdef _OPENMP
+c$OMP PARALLEL private(tid,nt,cnk,st,wcnk,wst) 
          tid = omp_get_thread_num()
          nt = omp_get_num_threads()
 #else
@@ -188,7 +188,9 @@ c$OMP PARALLEL private(tid,nt,cnk,st,wcnk,wst)
          call zdgemm_ovwr_left('t',cnk,k,dim+1,U(st,1),
      c        ldu,work(imt+mstart-1),dim+1,
      c        zwork(wst),wcnk)
+#ifdef _OPENMP
 c$OMP END PARALLEL 
+#endif
       endif
 c      print *,'U = '
 c      print *,((U(i,j),i=1,m),j=1,k)
@@ -205,8 +207,8 @@ c     %-----------------------------------------%
 c     | Form right Ritz-vectors
 c     |   V = V * Q
 c     %-----------------------------------------%
-c$OMP PARALLEL private(tid,nt,cnk,st,wcnk,wst) 
 #ifdef _OPENMP
+c$OMP PARALLEL private(tid,nt,cnk,st,wcnk,wst) 
          tid = omp_get_thread_num()
          nt = omp_get_num_threads()
 #else
@@ -224,7 +226,9 @@ c$OMP PARALLEL private(tid,nt,cnk,st,wcnk,wst)
          call zdgemm_ovwr_left('t',cnk,k,dim,V(st,1),
      c        ldv,work(iqt+mstart-1),dim,
      c        zwork(wst),wcnk)
+#ifdef _OPENMP
 c$OMP END PARALLEL 
+#endif
       endif    
 c      print *,'V = '
 c      print *,((V(i,j),i=1,n),j=1,k)

@@ -143,9 +143,9 @@ c The local variable ld was introduced to circumvent an apparent
 c bug in Intel's OpenMP implementation.
       ld = ldv
 
+#ifdef _OPENMP
 c$OMP PARALLEL private(i,p,q,l,tid,nt,cnk,st,j,ylocal) 
 c$OMP& firstprivate(ld) shared(ndot)
-#ifdef _OPENMP
       tid = omp_get_thread_num()
       nt = omp_get_num_threads()
 #else
@@ -179,15 +179,23 @@ c     Classical Gram-Schmidt: vnew = vnew - V(:,p:q)*(V(:,p:q)'*vnew)
                   work(j) = ylocal(j)
                enddo
             endif
+#ifdef _OPENMP
 c$OMP BARRIER
+#endif
             if (.not.tid.eq.0) then
+#ifdef _OPENMP
 c$OMP CRITICAL
+#endif
                do j=1,l
                   work(j) = work(j) + ylocal(j)
                enddo
+#ifdef _OPENMP
 c$OMP END CRITICAL
+#endif
             endif
+#ifdef _OPENMP
 c$OMP BARRIER
+#endif
             call cgemv('N',cnk,l,cmplx(-1.0,0.0),V(st,p),ld,work,1,
      c           cmplx(0.0,0.0),ylocal,1)
             do j=1,cnk
@@ -196,6 +204,8 @@ c$OMP BARRIER
          endif
          i = i+2
       enddo
+#ifdef _OPENMP
 c$OMP END PARALLEL
+#endif
       end      
 

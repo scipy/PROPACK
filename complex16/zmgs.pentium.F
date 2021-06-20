@@ -24,12 +24,16 @@ c     Check for quick return
          do i=p,q
             s = dcmplx(0d0,0d0)
 CDIR$ LOOP COUNT(10000)
+#ifdef _OPENMP
 c$OMP PARALLEL DO reduction(+:s)
+#endif
             do j=1,n
                s = s + dconjg(V(j,i))*vnew(j)
             enddo
 CDIR$ LOOP COUNT(10000)
+#ifdef _OPENMP
 c$OMP PARALLEL DO firstprivate(s)
+#endif
             do j=1,n
                vnew(j) = vnew(j) - s*V(j,i)
             enddo

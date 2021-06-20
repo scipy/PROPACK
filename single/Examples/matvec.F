@@ -177,7 +177,9 @@ c
 c     computes  y <- A'*x
 c
 CDIR$ LOOP COUNT(10000)
+#ifdef _OPENMP
 c$OMP PARALLEL DO private(j,sum)
+#endif
          do i=1,n
             sum = 0.0
 CDIR$ IVDEP
@@ -397,18 +399,24 @@ ccccccccccccccccccccc diagonal format cccccccccccccccccccccccccccc
       external lsame
       include 'matvec.h'
       
+#ifdef _OPENMP
 c$OMP PARALLEL DO 
+#endif
       do i=1,min(m,n)
          y(i) = values(i)*x(i)
       enddo
       if (m.ne.n) then
          if (lsame(transa,'n')) then
+#ifdef _OPENMP
 c$OMP PARALLEL DO 
+#endif
             do i=min(m,n)+1,m
                y(i) = 0.0
             enddo
          else
+#ifdef _OPENMP
 c$OMP PARALLEL DO 
+#endif
             do i=min(m,n)+1,n
                y(i) = 0.0
             enddo
