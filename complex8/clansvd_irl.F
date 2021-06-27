@@ -381,8 +381,8 @@ c     | Lanczos vectors                                   |
 c     |   U_{dim+1}^{+} = U_{dim+1} * P(:,1:k+1)          |
 c     |   V_{dim}^{+} = V_{dim} * Q(:,1:k)                |
 c     %---------------------------------------------------%
-c$OMP PARALLEL private(tid,nt,cnk,st,wcnk,wst) 
 #ifdef _OPENMP
+c$OMP PARALLEL private(tid,nt,cnk,st,wcnk,wst) 
             tid = omp_get_thread_num()
             nt = omp_get_num_threads()
 #else
@@ -406,7 +406,9 @@ c$OMP PARALLEL private(tid,nt,cnk,st,wcnk,wst)
             endif
             call csgemm_ovwr_left('n',cnk,k,dim,V(st,1),ldv,work(iq),
      c           dim,cwork(wst),wcnk)
+#ifdef _OPENMP
 c$OMP END PARALLEL
+#endif
             rnorm = work(ibeta+k-1)
             call second(t3)
             trestart = trestart + (t3-t2)

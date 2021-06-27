@@ -144,8 +144,8 @@ c     %-----------------------------------------%
          else
             mstart = 1
          endif
-c$OMP PARALLEL private(tid,nt,cnk,st,wcnk,wst) 
 #ifdef _OPENMP
+c$OMP PARALLEL private(tid,nt,cnk,st,wcnk,wst) 
          tid = omp_get_thread_num()
          nt = omp_get_num_threads()
 #else
@@ -162,7 +162,9 @@ c$OMP PARALLEL private(tid,nt,cnk,st,wcnk,wst)
          endif
          call sgemm_ovwr_left('t',cnk,k,dim+1,1.0,U(st,1),
      c        ldu,0.0,work(imt+mstart-1),dim+1,work(iwrk+wst-1),wcnk)
+#ifdef _OPENMP
 c$OMP END PARALLEL 
+#endif
       endif
 
       if (lsame(jobv,'y')) then
@@ -175,8 +177,8 @@ c     %-----------------------------------------%
 c     | Form right Ritz-vectors
 c     |   V = V * Q
 c     %-----------------------------------------%
-c$OMP PARALLEL private(tid,nt,cnk,st,wcnk,wst) 
 #ifdef _OPENMP
+c$OMP PARALLEL private(tid,nt,cnk,st,wcnk,wst) 
          tid = omp_get_thread_num()
          nt = omp_get_num_threads()
 #else
@@ -193,7 +195,9 @@ c$OMP PARALLEL private(tid,nt,cnk,st,wcnk,wst)
          endif
          call sgemm_ovwr_left('t',cnk,k,dim,1.0,V(st,1),ldv,0.0,
      c        work(iqt+mstart-1),dim,work(iwrk+wst-1),wcnk)
+#ifdef _OPENMP
 c$OMP END PARALLEL 
+#endif
       endif    
       
       call  second(t1)           

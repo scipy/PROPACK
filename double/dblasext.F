@@ -208,12 +208,16 @@ c
 
       if ((n.gt.0).and.(incx.ne.0)) then         
          if (incx.eq.1) then
+#ifdef _OPENMP
 c$OMP PARALLEL DO 
+#endif
             do i=1,n
                x(i) = 0d0
             enddo
          else
+#ifdef _OPENMP
 c$OMP PARALLEL DO firstprivate(incx) schedule(static)
+#endif
             do i=1,n
                x(1+(i-1)*incx) = 0d0
             enddo
@@ -232,12 +236,16 @@ c$OMP PARALLEL DO firstprivate(incx) schedule(static)
 
       if ((n.gt.0).and.(incx.ne.0)) then         
          if (incx.eq.1) then
+#ifdef _OPENMP
 c$OMP PARALLEL DO  schedule(static)
+#endif
             do i=1,n
                x(i) = 0
             enddo
          else
+#ifdef _OPENMP
 c$OMP PARALLEL DO firstprivate(incx) schedule(static)
+#endif
             do i=1,n
                x(1+(i-1)*incx) = 0
             enddo
@@ -256,12 +264,16 @@ c$OMP PARALLEL DO firstprivate(incx) schedule(static)
 
       if ((n.gt.0).and.(incx.ne.0)) then         
          if (incx.eq.1) then
+#ifdef _OPENMP
 c$OMP PARALLEL DO firstprivate(alpha) schedule(static)
+#endif
             do i=1,n
                x(i) = alpha
             enddo
          else
+#ifdef _OPENMP
 c$OMP PARALLEL DO firstprivate(alpha, incx) schedule(static)
+#endif
             do i=1,n
                x(1+(i-1)*incx) = alpha
             enddo
@@ -286,12 +298,16 @@ c
       if (n.le.0 .or. incy.eq.0 .or. incx.eq.0) return
       if (alpha.eq.zero .and. beta.eq.zero) then
          if (incy.eq.1) then
+#ifdef _OPENMP
 c$OMP PARALLEL DO  schedule(static)
+#endif
             do i=1,n
                y(i) = zero
             enddo
          else
+#ifdef _OPENMP
 c$OMP PARALLEL DO firstprivate(incy) schedule(static)
+#endif
             do i=1,n
                y(1+(i-1)*incy) = zero
             enddo
@@ -307,13 +323,17 @@ c$OMP PARALLEL DO firstprivate(incy) schedule(static)
             call pdcopy(n,x,incx,y,incy)
          else
             if (incx.eq.1 .and. incy.eq.1) then
+#ifdef _OPENMP
 c$OMP PARALLEL DO firstprivate(alpha) schedule(static)
+#endif
                do i=1,n
                   y(i) = alpha*x(i)
                enddo
             else
+#ifdef _OPENMP
 c$OMP PARALLEL DO firstprivate(incx, incy, alpha) 
 c$OMP& schedule(static) 
+#endif
                do i=1,n
                   y(1+(i-1)*incy) = alpha*x(1+(i-1)*incx)
                enddo
@@ -327,14 +347,18 @@ c DAXPY
             call pdaxpy(n,alpha,x,incx,y,incy)
          else
             if (incx.eq.1 .and. incy.eq.1) then
+#ifdef _OPENMP
 c$OMP PARALLEL DO firstprivate(alpha,beta) 
 c$OMP& schedule(static) 
+#endif
                do i=1,n
                   y(i) = alpha*x(i) + beta*y(i)
                enddo
             else
+#ifdef _OPENMP
 c$OMP PARALLEL DO firstprivate(alpha,beta,incx,incy)  
 c$OMP& schedule(static) 
+#endif
                do i=1,n
                   y(1+(i-1)*incy) = alpha*x(1+(i-1)*incx) + 
      c                 beta*y(1+(i-1)*incy)
@@ -361,12 +385,16 @@ c
       if (n.le.0 .or. incy.eq.0 .or. incx.eq.0) return
       if (alpha.eq.zero) then
          if (incy.eq.1) then
+#ifdef _OPENMP
 c$OMP PARALLEL DO schedule(static)
+#endif
            do i=1,n
                y(i) = zero
             enddo
          else
+#ifdef _OPENMP
 c$OMP PARALLEL DO firstprivate(incy) schedule(static)
+#endif
            do i=1,n
                y(1+(i-1)*incy) = zero
             enddo
@@ -376,12 +404,16 @@ c$OMP PARALLEL DO firstprivate(incy) schedule(static)
 
          if (alpha.eq.one) then
             if (incx.eq.1 .and. incy.eq.1) then
+#ifdef _OPENMP
 c$OMP PARALLEL DO  schedule(static)
+#endif
                do i=1,n
                   y(i) = x(i)*y(i)
                enddo
             else
+#ifdef _OPENMP
 c$OMP PARALLEL DO firstprivate(incx,incy) schedule(static)
+#endif
                do i=1,n
                   y(1+(i-1)*incy) = x(1+(i-1)*incx)*y(1+(i-1)*incy)
                enddo
@@ -389,13 +421,17 @@ c$OMP PARALLEL DO firstprivate(incx,incy) schedule(static)
 
          else
             if (incx.eq.1 .and. incy.eq.1) then
+#ifdef _OPENMP
 c$OMP PARALLEL DO firstprivate(alpha) schedule(static)
+#endif
                do i=1,n
                   y(i) = alpha*x(i)*y(i)
                enddo
             else
+#ifdef _OPENMP
 c$OMP PARALLEL DO firstprivate(alpha,incx,incy) 
 c$OMP& schedule(static) 
+#endif
                do i=1,n
                   y(1+(i-1)*incy) = alpha*x(1+(i-1)*incx)*
      c                 y(1+(i-1)*incy)

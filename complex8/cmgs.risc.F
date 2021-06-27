@@ -121,7 +121,9 @@ c     Select the next block of columns from V
          ndot = ndot + (q-p+1)
          coef = cmplx(zero,zero)
 CDIR$ LOOP COUNT(10000)
+#ifdef _OPENMP
 c$OMP PARALLEL DO reduction(+:coef) firstprivate(p) schedule(static) 
+#endif
          do j=1,n
             coef = coef + conjg(V(j,p))*vnew(j)
          enddo         
@@ -131,8 +133,10 @@ c   of inner loop on machines with fused multiply-add.
             newcoef = cmplx(zero,zero)
 CDIR$ IVDEP
 CDIR$ LOOP COUNT(10000)
+#ifdef _OPENMP
 c$OMP PARALLEL DO reduction(+:newcoef) private(vn0) firstprivate(i,coef) 
 c$OMP& schedule(static) 
+#endif
             do j=1,n
                vn0 = vnew(j) - coef*V(j,i-1)
                newcoef = newcoef + conjg(V(j,i))*vn0 
@@ -141,7 +145,9 @@ c$OMP& schedule(static)
             coef = newcoef
          enddo
 CDIR$ LOOP COUNT(10000)
+#ifdef _OPENMP
 c$OMP PARALLEL DO firstprivate(coef,q) schedule(static)
+#endif
          do j=1,n
             vnew(j) = vnew(j) - coef*V(j,q)
          enddo
