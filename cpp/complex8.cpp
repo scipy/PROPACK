@@ -3,6 +3,8 @@
 #include <complex>
 #include <chrono>
 #include <algorithm>
+#include <numeric>
+#include <random>
 #include <iostream>
 
 
@@ -18,9 +20,25 @@ typedef void (*APROD_t)(const char *const,
 			complex_t* cparm,
 			integer_t* iparm);
 
+
 int sgn(real_t val) {
     return (real_t(0) < val) - (val < real_t(0));
 }
+
+// Globals
+integer_t nopx = 0, nreorth = 0, nreorthu = 0, nreorthv = 0, ndot = 0, nitref = 0, 
+  nrestart = 0, nbsvd = 0, nlandim = 0, nsing = 0;
+real_t tmvopx = 0.0, tgetu0 = 0.0, tupdmu = 0.0, tupdnu = 0.0, tintv = 0.0, tlanbpro = 0.0,
+  treorthu = 0.0, treorthv = 0.0, telru = 0.0, telrv = 0.0, tbsvd = 0.0, tnorm2 = 0.0,
+  tlansvd = 0.0, tritzvec = 0.0, trestart = 0.0, treorth = 0.0, tdot = 0.0;
+
+
+// must include after frontmatter in this order!
+#include "polyfill.hpp"
+#include "utilities.hpp"
+#include "csafescal.hpp"
+#include "cgetu0.hpp"
+
 
 void clanbpro(const integer_t& m,
 	      const integer_t& n,
@@ -46,6 +64,7 @@ void clanbpro(const integer_t& m,
   // %------------%
   // | Parameters |
   // %------------%
+  constexpr integer_t one_int = 1;
   constexpr real_t one = 1.0;
   constexpr real_t zero = 0.0;
   constexpr real_t FUDGE = 1.01;
@@ -56,16 +75,14 @@ void clanbpro(const integer_t& m,
   // %----------------------%
   // | External Subroutines |
   // %----------------------%
-  // external pcaxpy
-  // external cgetu0,creorth,csafescal,pcsaxpy
+  // external creorth
 
   // %--------------------%
   // | External Functions |
   // %--------------------%
-  // real slamch,psnrm2,psdot,slapy2,pscnrm2
-  // complex pcdotc
-  // external psnrm2,psdot,pscnrm2,pcdotc
-  // external slamch,slapy2
+  // real slamch,psnrm2,psdot
+  // external psnrm2,psdot
+  // external slamch
 
   // -------------------- Here begins executable code ---------------------
   auto t1 = std::chrono::steady_clock::now();
@@ -80,6 +97,17 @@ void clanbpro(const integer_t& m,
   const real_t epsn2 = std::sqrt(std::max(m, n))*eps;
   constexpr real_t sfmin = 1.0/std::numeric_limits<real_t>::max();
 
+  // Parameters and declarations for goto nonsense
+  real_t anormest;
+  real_t amax, alpha, beta, mumax, numax, a1, b1, nrm;
+  complex_t s;
+  logical_t force_reorth;
+  integer_t j0;
+  constexpr integer_t imu = 0;
+  const integer_t inu = imu + k;
+  constexpr integer_t iidx = 0;
+  constexpr integer_t is = 0;
+
   // %------------------------%
   // | Set default parameters |
   // %------------------------%
@@ -91,7 +119,7 @@ void clanbpro(const integer_t& m,
     anorm = soption[2];
   }
   else if (k0 > 0) {
-    anorm = slapy2(B[0][0], B[0][1]);
+    anorm = slapy2(&B[0][0], &B[0][1]);
     if (anorm <= zero) {
       ierr = -1;
       goto l9999;
@@ -105,9 +133,9 @@ void clanbpro(const integer_t& m,
   // %---------------------%
   // | Get starting vector |
   // %---------------------%
-  real_t anormest;
   if (rnorm == zero) {
-    cgetu0(&n_char, m, n, k0, 3, U[0][k0], rnorm, U, // NBPM: 3 not changed
+    constexpr integer_t ntry = 3; // NBPM: 3 not changed
+    cgetu0(n_char, m, n, k0, ntry, &U[0][k0], rnorm, U,
 	   ldu, aprod, cparm, iparm, ierr, ioption[0], anormest,
 	   cwork);
     anorm = std::max(anorm, anormest);
@@ -116,10 +144,6 @@ void clanbpro(const integer_t& m,
   // %------------------------------%
   // | Set pointers into work array |
   // %------------------------------%
-  constexpr integer_t imu = 0;
-  const integer_t inu = imu + k;
-  constexpr integer_t iidx = 0;
-  constexpr integer_t is = 0;
   std::fill(swork, swork+2*k+2, 0);
   std::fill(iwork, iwork+2*k+1, 0);
   std::fill(cwork, cwork+std::max(m, n), 0);
@@ -127,10 +151,6 @@ void clanbpro(const integer_t& m,
   // %---------------------------%
   // | Prepare Lanczos iteration |
   // %---------------------------%
-  real_t amax, alpha, beta, mumax, numax, a1, b1, nrm;
-  complex_t s;
-  logical_t force_reorth;
-  integer_t j0;
   if (k0 == 0) {
     amax = zero;
     alpha = zero;
@@ -143,18 +163,18 @@ void clanbpro(const integer_t& m,
     // | underestimated at the beginning of the iteration. |
     // %---------------------------------------------------%
     if (n > m) {
-      cgetu0(&n_char, m, n, 0, 1, cwork[is], nrm, U, ldu, aprod, cparm, // NBPM: 0, 1 unchanged
-	     iparm, ierr, ioption[0], anormest, cwork[is+m]);
+      cgetu0(n_char, m, n, 0, 1, &cwork[is], nrm, U, ldu, aprod, cparm, // NBPM: 0, 1 unchanged
+	     iparm, ierr, ioption[0], anormest, &cwork[is+m]);
     }
     else {
-      cgetu0(&c_char, m, n, 0, 1, cwork[is], nrm, V, ldv, aprod, cparm, // NBPM: 0, 1 unchanged
-	     iparm, ierr, ioption[0], anormest, cwork[is+n]);
+      cgetu0(c_char, m, n, 0, 1, &cwork[is], nrm, V, ldv, aprod, cparm, // NBPM: 0, 1 unchanged
+	     iparm, ierr, ioption[0], anormest, &cwork[is+n]);
     }
     anorm = std::max(anorm, FUDGE*anormest);
     // std::cout << "anorm = " << anorm << std::endl;
     j0 = 0;
     if (beta != zero) {
-      csafescal(m, beta, U[0][0]);
+      csafescal(&m, &beta, &U[0][0]);
     }
     // std::cout << "U0 = ";
     // for (auto i = 0; i < m; ++i) std::cout << U[i, 0] << " ";
@@ -175,14 +195,14 @@ void clanbpro(const integer_t& m,
     iwork[iidx+1] = k0-1;
     iwork[iidx+2] = k0;
 
-    pcsscal(m, rnorm, U[0][k0], 1);
+    csscal(&m, &rnorm, &U[0][k0], &one_int);
     t2 = std::chrono::steady_clock::now();
     creorth(m, k0, U, ldu, U[0][k0], rnorm, iwork[iidx], kappa,
 	    cwork[is], ioption[0]);
     treorthu += (std::chrono::steady_clock::now() - t2).count();
-    csafescal(m, rnorm, U[0][k0]);
-    sset_mu(k0, swork[imu], iwork[iidx], epsn2);
-    sset_mu(k0, swork[inu], iwork[iidx], epsn2);
+    csafescal(&m, &rnorm, &U[0][k0]);
+    sset_mu(k0, &swork[imu], &iwork[iidx], epsn2);
+    sset_mu(k0, &swork[inu], &iwork[iidx], epsn2);
     beta = rnorm;
 
     // %--------------------------------------%
@@ -230,13 +250,14 @@ void clanbpro(const integer_t& m,
     // std::cout << std::endl;
 
     if (j == 1) {
-      alpha = pscnrm2(n, V[0][j], 1);
+      alpha = scnrm2(&n, &V[0][j], &one_int);
       anorm = std::max(anorm, FUDGE*alpha);
       // std::cout << "j, alpha = " << j << ", " << alpha << std::endl;
     }
     else {
-      pcsaxpy(n, -beta, V[0][j-1], 1, V[0][j], 1);
-      alpha = pscnrm2(n, V[0][j], 1);
+      const auto negbeta = -beta;
+      csaxpy(&n, &negbeta, &V[0][j-1], &one_int, &V[0][j], &one_int);
+      alpha = scnrm2(&n, &V[0][j], &one_int); 
       // std::cout << "j, alpha = " << j << ", " << alpha << std::endl;
 
       // %------------------------------------%
@@ -245,10 +266,10 @@ void clanbpro(const integer_t& m,
       t2 = std::chrono::steady_clock::now();
       if ((j > 0) && (ioption[1] > 0) && (alpha < kappa*beta)) {
 	for (integer_t i = 0; i < ioption[1]; ++i) {
-	  s = pcdotc(n, V[0][j-1], 1, V[0][j], 1);
+	  s = -cdotc(&n, &V[0][j-1], &one_int, &V[0][j], &one_int);
 	  // std::cout << "s = " << s << std::endl;
-	  pcaxpy(n, -s, V[0][j-1], 1, V[0][j], 1);
-	  nrm = pscnrm2(n, V[0][j], 1);
+	  caxpy(&n, &s, &V[0][j-1], &one_int, &V[0][j], &one_int);
+	  nrm = scnrm2(&n, &V[0][j], &one_int);
 	  // std::cout << "nrm = " << nrm << std::endl;
 	  if (nrm >= kappa*alpha) {
 	    goto l10;
@@ -284,8 +305,8 @@ void clanbpro(const integer_t& m,
     // | Update the nu recurrence |
     // %--------------------------%
     if (!full_reorth && (alpha != zero)) {
-      supdate_nu(numax, swork[imu], swork[inu], j,
-		 B[0][0], B[0][1], anorm, epsn2);
+      supdate_nu(numax, &swork[imu], &swork[inu], j,
+		 &B[0][0], &B[0][1], anorm, epsn2);
     }
 
     // %------------------------------%
@@ -299,14 +320,14 @@ void clanbpro(const integer_t& m,
 	iwork[iidx+2] = j;
       }
       else if (!force_reorth) {
-	scompute_int(swork[inu], j-1, delta, eta, iwork[iidx]);
+	scompute_int(&swork[inu], j-1, delta, eta, &iwork[iidx]);
       }
       t2 = std::chrono::steady_clock::now();
       creorth(n, j-1, V, ldv, V[0][j], alpha, iwork[iidx],
 	      kappa, cwork[is], ioption[0]);
       treorthv += (std::chrono::steady_clock::now() - t2).count();
 
-      sset_mu(j-1, swork[inu], iwork[iidx], eps);
+      sset_mu(j-1, &swork[inu], &iwork[iidx], eps);
       numax = eta;
       force_reorth = !force_reorth;
     }
@@ -322,9 +343,9 @@ void clanbpro(const integer_t& m,
       // | Try to build an orthogonal subspace, starting  |
       // | with a random vector.                          |
       // %------------------------------------------------%
-      cgetu0(&c_char, m, n, j-1, 3, V[0][j], alpha, V, ldv, // NBPM: 3 left unchanged
+      cgetu0(c_char, m, n, j-1, 3, &V[0][j], alpha, V, ldv, // NBPM: 3 left unchanged
 	     aprod, cparm, iparm, ierr, ioption[0], anormest,
-	     cwork[is]);
+	     &cwork[is]);
       if (alpha == zero) {
 	// %------------------------------------------------%
 	// | We failed to generate a new random vector      |
@@ -343,7 +364,7 @@ void clanbpro(const integer_t& m,
 	// | can continue the LBD and "deflate" the subspace |
 	// | by setting alpha_{j} = 0.                       |
 	// %-------------------------------------------------%
-	csafescal(n, alpha, V[0][j]);
+	csafescal(&n, &alpha, &V[0][j]);
 	alpha = zero;
 	force_reorth = (delta <= zero);
       }
@@ -354,7 +375,7 @@ void clanbpro(const integer_t& m,
     B[j][0] = alpha;
 
     if (alpha != zero) {
-      csafescal(n, alpha, V[0][j]);
+      csafescal(&n, &alpha, &V[0][j]);
     }
 
     // std::cout << "V1_scaled = ";
@@ -369,8 +390,9 @@ void clanbpro(const integer_t& m,
     tmvopx += (std::chrono::steady_clock::now() - t2).count();
     ++nopx;
 
-    pcsaxpy(m, -alpha, U[0][j], 1, U[0][j+1], 1);
-    beta = pscnrm2(m, U[0][j+1], 1);
+    const auto negalpha = -alpha;
+    csaxpy(&m, &negalpha, &U[0][j], &one_int, &U[0][j+1], &one_int);
+    beta = scnrm2(&m, &U[0][j+1], &one_int);
     // std::cout << "j, beta = " << j << ", " << beta << std::endl;
 
     // %------------------------------------%
@@ -379,10 +401,10 @@ void clanbpro(const integer_t& m,
     t2 = std::chrono::steady_clock::now();
     if ((ioption[1] > 0) && (beta < kappa*alpha)) {
       for (integer_t i = 0; i < ioption[1]; ++i) {
-	s = pcdotc(m, U[0][j], 1, U[0][j+1], 1);
+	s = -cdotc(&m, &U[0][j], &one_int, &U[0][j+1], &one_int);
 	// std::cout << "s = " << s << std::endl;
-	pcaxpy(m, -s, U[0][j], 1, U[0][j+1], 1);
-	nrm = pscnrm2(m,U[0][j+1], 1);
+	caxpy(&m, &s, &U[0][j], &one_int, &U[0][j+1], &one_int);
+	nrm = scnrm2(&m, &U[0][j+1], &one_int);
 	// std::cout << "nrm = " << nrm << std::endl;
 	if (nrm >= kappa*beta) {
 	  goto l20;
@@ -404,7 +426,7 @@ void clanbpro(const integer_t& m,
     // | Update estimate of ||A||_2 |
     // %----------------------------%
     if (j <= 0) {
-      a1 = slapy2(B[0][0], B[0][1]);
+      a1 = slapy2(&B[0][0], &B[0][1]);
     }
     else {
       a1 = B[j][0]/amax;
@@ -416,7 +438,7 @@ void clanbpro(const integer_t& m,
     // | Update the mu recurrence |
     // %--------------------------%
     if (!full_reorth && (beta != zero)) {
-      supdate_mu(mumax, swork[imu], swork[inu], j, B[0][0], B[0][1], anorm, epsn2);
+      supdate_mu(mumax, &swork[imu], &swork[inu], j, &B[0][0], &B[0][1], anorm, epsn2);
     }
 
     // %--------------------------------------%
@@ -429,7 +451,7 @@ void clanbpro(const integer_t& m,
 	iwork[iidx+2] = j+1;
       }
       else if (!force_reorth) {
-	scompute_int(swork[imu], j, delta, eta, iwork[iidx]);
+	scompute_int(&swork[imu], j, delta, eta, &iwork[iidx]);
       }
       else {
 	for (integer_t i = 0; i < 2*j+1; ++i) {
@@ -445,7 +467,7 @@ void clanbpro(const integer_t& m,
       creorth(m, j, U, ldu, U[0][j+1], beta, iwork[iidx], kappa, cwork[is], ioption[0]);
       treorthu += (std::chrono::steady_clock::now() - t2).count();
 
-      sset_mu(j, swork[imu], iwork[iidx], eps);
+      sset_mu(j, &swork[imu], &iwork[iidx], eps);
       mumax = eta;
       force_reorth = !force_reorth;
     }
@@ -461,8 +483,8 @@ void clanbpro(const integer_t& m,
       // | Try to build an orthogonal subspace, starting |
       // | with a random vector.                         |
       // %-----------------------------------------------%
-      cgetu0(&n_char, m, n, j, 3, U[0][j+1], beta, U, ldu, aprod, // NBPM: 3 left unchanged
-	     cparm, iparm, ierr, ioption[0], anormest, cwork[is]);
+      cgetu0(n_char, m, n, j, 3, &U[0][j+1], beta, U, ldu, aprod, // NBPM: 3 left unchanged
+	     cparm, iparm, ierr, ioption[0], anormest, &cwork[is]);
       if (beta == zero) {
 	// %-----------------------------------------------%
 	// | We failed to generate a new random vector     |
@@ -481,7 +503,7 @@ void clanbpro(const integer_t& m,
 	// | continue the LBD and "deflate" the subspace by |
 	// | setting beta_{j+1} = 0.                        |
 	// %------------------------------------------------%
-	csafescal(m, beta, U[0][j+1]);
+	csafescal(&m, &beta, &U[0][j+1]);
 	beta = zero;
 	force_reorth = (delta <= zero);
       }
@@ -492,7 +514,7 @@ void clanbpro(const integer_t& m,
 
     B[j][1] = beta;
     if ((beta != zero) && (beta != one)) {
-      csafescal(m, beta, U[0][j+1]);
+      csafescal(&m, &beta, &U[0][j+1]);
     }
     rnorm = beta;
     t2 = std::chrono::steady_clock::now();
@@ -505,158 +527,3 @@ void clanbpro(const integer_t& m,
 
 // **********************************************************************
 
-void sset_mu(const integer_t& k,
-	     real_t* mu,
-	     const integer_t* index,
-	     const real_t& val) {
-  integer_t i = 0;
-  integer_t p, q;
-  while ((index[i] < k) && index[i] >= 0) {
-    p = index[i];
-    q = index[i+1];
-    for (integer_t j = p; p < q; ++j) {
-      mu[j] = val;
-    }
-    i += 2;
-  }
-}
-
-// **********************************************************************
-
-void scompute_int(const real_t* mu,
-		  const integer_t& j,
-		  const real_t& delta,
-		  const real_t& eta,
-		  integer_t* index) {
-
-  auto t1 = std::chrono::steady_clock::now();
-  if (delta < eta) {
-    std::cerr << "Warning delta<eta in scompute_int" << std::endl;
-    return;
-  }
-
-  integer_t s, k;
-  integer_t ip = 0;
-  index[0] = 0;
-  integer_t i = 0;
-  while(i <= j) {
-    // find the next mu(k), k>i where abs(mu(k)) > delta
-    for (k = i; k < j; ++k) {
-      if (std::abs(mu[k]) > delta) {
-	goto l10;
-      }
-    }
-    goto l40;
-    // find smallest i<k such that for all j=i,..,k, m(j) >= eta
-  l10:
-    for (s = k-1; s >= std::max(i, 0); --s) {
-      if (std::abs(mu[s]) < eta) {
-	goto l20;
-      }
-    }
-  l20:
-    ++ip;
-    index[ip] = s + 1;
-    for (i = s; i < j; ++i) {
-      if (std::abs(mu[i]) < eta) {
-	goto l30;
-      }
-    }
-  l30:
-    ++ip;
-    index[ip] = i - 1;
-  }
- l40:
-  ++ip;
-  index[ip] = j + 1;
-  tintv += (std::chrono::steady_clock::now() - t1).count();
-}
-
-// **********************************************************************
-
-void supdate_mu(real_t& mumax,
-		real_t* mu,
-		const real_t* nu,
-		const integer_t& j,
-		const real_t* alpha,
-		const real_t* beta,
-		const real_t& anorm,
-		const real_t& eps1) {
-  // %------------%
-  // | Parameters |
-  // %------------%
-  constexpr real_t one = 1.0;
-  constexpr real_t zero = 0.0;
-  constexpr real_t FUDGE = 1.01;
-
-  // %--------------------%
-  // | External Functions |
-  // %--------------------%
-  // real slamch,slapy2
-  // external slamch,slapy2
-
-  real_t d;
-  auto t1 = std::chrono::steady_clock::now();
-  if (j == 0) {
-    d = eps1*(slapy2(alpha[j], beta[j]) + alpha[0]) + eps1*anorm;
-    mu[0] = eps1/beta[0];
-    mumax = std::abs(mu[0]);
-  }
-  else {
-    mu[0] = alpha[0]*nu[0] - alpha[j]*mu[0];
-    d = eps1*(slapy2(alpha[j], beta[j]) + alpha[0]) + eps1*anorm;
-    mu[0] = (mu[0] + std::abs(d)*sgn(mu[0])) / beta[j];
-    mumax = std::abs(mu[0]);
-    for (integer_t k = 1; k < j-1; ++k) {
-      mu[k] = alpha[k]*nu[k] + beta[k-1]*nu[k-1] - alpha[j]*mu[k];
-      d = eps1*(slapy2(alpha[j], beta[j]) + slapy2(alpha[k], beta[k-1])) + eps1*anorm;
-      mu[k] = (mu[k] + std::abs(d)*sgn(mu[k])) / beta[j];
-      mumax = std::max(mumax, std::abs(mu[k]));
-    }
-    mu[j] = beta[j-1]*nu[j-1];
-    d = eps1*(slapy2(alpha[j], beta[j]) + slapy2(alpha[j], beta[j-1])) + eps1*anorm;
-    mu[j] = (mu[j] + std::abs(d)*sgn(mu[j])) / beta[j];
-    mumax = std::max(mumax, std::abs(mu[j]));
-  }
-  mu[j+1] = one;
-  tupdmu += (std::chrono::steady_clock::now() - t1).count();
-}
-
-// **********************************************************************
-
-void supdate_nu(real_t& numax,
-		const real_t* mu,
-		real_t* nu,
-		const integer_t j,
-		const real_t* alpha,
-		const real_t* beta,
-		const real_t& anorm,
-		const real_t& eps1) {
-
-  // %------------%
-  // | Parameters |
-  // %------------%
-  constexpr real_t one = 1.0;
-  constexpr real_t zero = 0.0;
-  constexpr real_t FUDGE = 1.01;
-
-  // %--------------------%
-  // | External Functions |
-  // %--------------------%
-  // real slamch,slapy2
-  // external slamch,slapy2
-
-  real_t d;
-  auto t1 = std::chrono::steady_clock::now();
-  if (j > 0) {
-    numax = zero;
-    for (integer_t k = 0; k < j-1; ++k) {
-      nu[k] = beta[k]*mu[k+1] + alpha[k]*mu[k] -beta[j-1]*nu[k];
-      d = eps1*(slapy2(alpha[k], beta[k]) + slapy2(alpha[j], beta[j-1])) + eps1*anorm;
-      nu[k] = (nu[k] + std::abs(d)*sgn(nu[k])) / alpha[j];
-      numax = std::max(numax, std::abs(nu[k]));
-    }
-    nu[j] = one;
-  }
-  tupdnu += (std::chrono::steady_clock::now() - t1).count();
-}
