@@ -22,9 +22,6 @@ void csscal(const integer_t* n,
 complex_t complex_prod(const complex_t& a, const complex_t& b) {
   return std::conj(a)*b;
 }
-complex_t add_c(const complex_t& a, const complex_t& b) {
-  return a + b;
-}
 complex_t cdotc(const integer_t* n,
                 const complex_t* cx,
                 /*unused*/const integer_t* incx,

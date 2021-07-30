@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <numeric>
 #include <random>
+#include <memory>
 #include <iostream>
 
 
@@ -37,8 +38,8 @@ real_t tmvopx = 0.0, tgetu0 = 0.0, tupdmu = 0.0, tupdnu = 0.0, tintv = 0.0, tlan
 #include "polyfill.hpp"
 #include "utilities.hpp"
 #include "csafescal.hpp"
+#include "creorth.hpp"
 #include "cgetu0.hpp"
-
 
 void clanbpro(const integer_t& m,
 	      const integer_t& n,
@@ -71,18 +72,6 @@ void clanbpro(const integer_t& m,
   constexpr real_t kappa = 0.717;
   constexpr char c_char = 'c';
   constexpr char n_char = 'n';
-
-  // %----------------------%
-  // | External Subroutines |
-  // %----------------------%
-  // external creorth
-
-  // %--------------------%
-  // | External Functions |
-  // %--------------------%
-  // real slamch,psnrm2,psdot
-  // external psnrm2,psdot
-  // external slamch
 
   // -------------------- Here begins executable code ---------------------
   auto t1 = std::chrono::steady_clock::now();
@@ -197,8 +186,8 @@ void clanbpro(const integer_t& m,
 
     csscal(&m, &rnorm, &U[0][k0], &one_int);
     t2 = std::chrono::steady_clock::now();
-    creorth(m, k0, U, ldu, U[0][k0], rnorm, iwork[iidx], kappa,
-	    cwork[is], ioption[0]);
+    creorth(m, k0, U, ldu, &U[0][k0], rnorm, &iwork[iidx], kappa,
+	    &cwork[is], ioption[0]);
     treorthu += (std::chrono::steady_clock::now() - t2).count();
     csafescal(&m, &rnorm, &U[0][k0]);
     sset_mu(k0, &swork[imu], &iwork[iidx], epsn2);
@@ -323,8 +312,8 @@ void clanbpro(const integer_t& m,
 	scompute_int(&swork[inu], j-1, delta, eta, &iwork[iidx]);
       }
       t2 = std::chrono::steady_clock::now();
-      creorth(n, j-1, V, ldv, V[0][j], alpha, iwork[iidx],
-	      kappa, cwork[is], ioption[0]);
+      creorth(n, j-1, V, ldv, &V[0][j], alpha, &iwork[iidx],
+	      kappa, &cwork[is], ioption[0]);
       treorthv += (std::chrono::steady_clock::now() - t2).count();
 
       sset_mu(j-1, &swork[inu], &iwork[iidx], eps);
@@ -464,7 +453,7 @@ void clanbpro(const integer_t& m,
 
     l25:
       t2 = std::chrono::steady_clock::now();
-      creorth(m, j, U, ldu, U[0][j+1], beta, iwork[iidx], kappa, cwork[is], ioption[0]);
+      creorth(m, j, U, ldu, &U[0][j+1], beta, &iwork[iidx], kappa, &cwork[is], ioption[0]);
       treorthu += (std::chrono::steady_clock::now() - t2).count();
 
       sset_mu(j, &swork[imu], &iwork[iidx], eps);
