@@ -1,6 +1,12 @@
 #ifndef UTILITIES_HPP_
 #define UTILITIES_HPP_
 
+
+int sgn(real_t val) {
+    return (real_t(0) < val) - (val < real_t(0));
+}
+
+
 void sset_mu(const integer_t& k,
              real_t* mu,
              const integer_t* index,
@@ -82,8 +88,6 @@ void supdate_mu(real_t& mumax,
   // | Parameters |
   // %------------%
   constexpr real_t one = 1.0;
-  constexpr real_t zero = 0.0;
-  constexpr real_t FUDGE = 1.01;
 
   // %--------------------%
   // | External Functions |
@@ -134,13 +138,6 @@ void supdate_nu(real_t& numax,
   // %------------%
   constexpr real_t one = 1.0;
   constexpr real_t zero = 0.0;
-  constexpr real_t FUDGE = 1.01;
-
-  // %--------------------%
-  // | External Functions |
-  // %--------------------%
-  // real slamch
-  // external slamch
 
   real_t d;
   auto t1 = std::chrono::steady_clock::now();

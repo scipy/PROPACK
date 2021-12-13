@@ -1,33 +1,9 @@
 // C++ port of PROPACK
 
-#include <complex>
-#include <chrono>
-#include <algorithm>
-#include <numeric>
-#include <random>
-#include <memory>
-#include <iostream>
-
-
-typedef int integer_t;
-typedef float real_t;
-typedef std::complex<real_t> complex_t;
-typedef bool logical_t;
-typedef void (*APROD_t)(const char *const,
-			const integer_t& m,
-			const integer_t& n,
-			complex_t* x,
-			complex_t* y,
-			complex_t* cparm,
-			integer_t* iparm);
-
-
-int sgn(real_t val) {
-    return (real_t(0) < val) - (val < real_t(0));
-}
+#include "complex8.hpp"
 
 // Globals
-integer_t nopx = 0, nreorth = 0, nreorthu = 0, nreorthv = 0, ndot = 0, nitref = 0, 
+integer_t nopx = 0, nreorth = 0, nreorthu = 0, nreorthv = 0, ndot = 0, nitref = 0,
   nrestart = 0, nbsvd = 0, nlandim = 0, nsing = 0;
 real_t tmvopx = 0.0, tgetu0 = 0.0, tupdmu = 0.0, tupdnu = 0.0, tintv = 0.0, tlanbpro = 0.0,
   treorthu = 0.0, treorthv = 0.0, telru = 0.0, telrv = 0.0, tbsvd = 0.0, tnorm2 = 0.0,
@@ -84,7 +60,6 @@ void clanbpro(const integer_t& m,
   constexpr real_t eps34 = std::pow(eps, 3.0/4.0);
   const real_t epsn = std::max(m, n)*eps;
   const real_t epsn2 = std::sqrt(std::max(m, n))*eps;
-  constexpr real_t sfmin = 1.0/std::numeric_limits<real_t>::max();
 
   // Parameters and declarations for goto nonsense
   real_t anormest;
@@ -246,7 +221,7 @@ void clanbpro(const integer_t& m,
     else {
       const auto negbeta = -beta;
       csaxpy(&n, &negbeta, &V[0][j-1], &one_int, &V[0][j], &one_int);
-      alpha = scnrm2(&n, &V[0][j], &one_int); 
+      alpha = scnrm2(&n, &V[0][j], &one_int);
       // std::cout << "j, alpha = " << j << ", " << alpha << std::endl;
 
       // %------------------------------------%
@@ -515,4 +490,3 @@ void clanbpro(const integer_t& m,
 
 
 // **********************************************************************
-

@@ -1,6 +1,11 @@
 #ifndef CREORTH_HPP_
 #define CREORTH_HPP_
 
+extern "C" {
+  void cgemv_(const char*, int*, int*, complex_t*, complex_t*, int*, complex_t*, int*, complex_t*, complex_t*, int*);
+}
+
+
 void ccgs(const integer_t& n,
           const integer_t& k,
           complex_t** V,
@@ -16,6 +21,8 @@ void ccgs(const integer_t& n,
   constexpr complex_t zero_cmplx = complex_t(0.0, 0.0);
   constexpr complex_t one_cmplx = complex_t(1.0, 0.0);
   constexpr complex_t negone_cmplx = complex_t(-1.0, 0.0);
+  constexpr char c_char = 'C';
+  constexpr char n_char = 'N';
   integer_t i, p, q, l;
   auto ylocal = std::unique_ptr<complex_t[]>(new complex_t[n]);
 
@@ -41,8 +48,8 @@ void ccgs(const integer_t& n,
       if (tid == nt - 1) {
         cnk = n-st+1;
       }
-      cgemv('C', &cnk, &l, &one_cmplx, &V[st][p], &ld, &vnew[st], &one_int,
-            &zero_cmplx, ylocal.get(), &one_int);
+      cgemv_(&c_char, &cnk, &l, const_cast<complex_t*>(&one_cmplx), &V[st][p], const_cast<integer_t*>(&ld), &vnew[st], const_cast<integer_t*>(&one_int),
+	     const_cast<complex_t*>(&zero_cmplx), ylocal.get(), const_cast<integer_t*>(&one_int));
 
       if (tid == 0) {
         std::copy(ylocal.get(), ylocal.get() + n, work);
@@ -50,8 +57,8 @@ void ccgs(const integer_t& n,
       if (tid != 0) {
         std::transform(work, work + n, ylocal.get(), work, std::plus<>());
       }
-      cgemv('N', &cnk, &l, &negone_cmplx, &V[st][p], &ld, work, &one_int,
-            &zero_cmplx, ylocal.get(), &one_int);
+      cgemv_(&n_char, &cnk, &l, const_cast<complex_t*>(&negone_cmplx), &V[st][p], const_cast<integer_t*>(&ld), work, const_cast<integer_t*>(&one_int),
+	     const_cast<complex_t*>(&zero_cmplx), ylocal.get(), const_cast<integer_t*>(&one_int));
       std::transform(&vnew[st-1], &vnew[st-1+cnk], ylocal.get(), &vnew[st-1], std::plus<>());
     }
     i += 2;
@@ -79,7 +86,6 @@ void creorth(const integer_t& n,
   // %-----------------%
   // | Local variables |
   // %-----------------%
-  integer_t itry;
   real_t normvnew_0;
 
   if ((k <= 0) || (n <= 0)) {
@@ -92,7 +98,8 @@ void creorth(const integer_t& n,
     if (iflag == 1) {
       ccgs(n, k, V, ldv, vnew, index, work);
     } else {
-      cmgs(n, k, V, ldv, vnew, index);
+      // TODO: !
+      // cmgs(n, k, V, ldv, vnew, index);
     }
     ndot += k;
     normvnew = scnrm2(&n, vnew, &one_int);

@@ -38,7 +38,7 @@ void axpy(const integer_t* n,
           VectorType* y,
           /*unused*/const integer_t* incy) {
   // TODO: use std::transform
-  for (std::size_t ii = 0; ii < *n; ++ii) {
+  for (auto ii = 0; ii < *n; ++ii) {
     y[ii] += *a*x[ii];
   }
 }
@@ -66,7 +66,7 @@ real_t scnrm2(const integer_t* n,
               /*unused*/const integer_t* incx) {
   // TODO: use Boost norm functions
   real_t ans = 0;
-  for (std::size_t ii = 0; ii < *n; ++ii) {
+  for (auto ii = 0; ii < *n; ++ii) {
     ans += std::real(std::conj(cx[ii])*cx[ii]);
   }
   return std::sqrt(ans);

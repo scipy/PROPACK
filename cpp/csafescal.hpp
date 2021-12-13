@@ -10,13 +10,12 @@ void csafescal(const integer_t* n,
   // %------------%
   constexpr integer_t one_int = 1;
   constexpr real_t one = 1.0;
-  constexpr real_t zero = 0.0;
 
   // %-----------------%
   // | Local variables |
   // %-----------------%
-  integer_t dummy, info;
-  constexpr real_t sfmin = 1.0/std::numeric_limits<real_t>::max();
+  // integer_t dummy, info;
+  // constexpr real_t sfmin = 1.0/std::numeric_limits<real_t>::max();
 
   // TODO: the right thing
   const real_t tmp = one / *alpha;
