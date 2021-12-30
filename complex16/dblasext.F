@@ -510,4 +510,12 @@ c$OMP& schedule(static)
       return
       end
 
-         
+#ifdef SCIPY_USE_G77_CDOTC_WRAP
+      complex function zdotc(n, cx, incx, cy, incy)
+      double complex cx(*), cy(*), c
+      integer n, incx, incy
+      call WZDOTC(n, cx, incx, cy, incy)
+      zdotc = c
+      return
+      end
+#endif

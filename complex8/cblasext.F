@@ -798,3 +798,13 @@ c
       return
       end
 #endif
+
+#ifdef SCIPY_USE_G77_CDOTC_WRAP
+      complex function cdotc(n, cx, incx, cy, incy)
+      complex cx(*), cy(*), c
+      integer n, incx, incy
+      call WCDOTC(n, cx, incx, cy, incy)
+      cdotc = c
+      return
+      end
+#endif
