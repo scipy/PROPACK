@@ -22,13 +22,13 @@ c     Check for quick return
       do while(p.le.k .and.p .gt.0 .and. p.le.q)
          ndot = ndot + (q-p+1)
          do i=p,q
-            s = dcmplx(0d0,0d0)
+            s = cmplx(0d0,0d0,Kind=Kind(0d0))
 CDIR$ LOOP COUNT(10000)
 #ifdef _OPENMP
 c$OMP PARALLEL DO reduction(+:s)
 #endif
             do j=1,n
-               s = s + dconjg(V(j,i))*vnew(j)
+               s = s + conjg(V(j,i))*vnew(j)
             enddo
 CDIR$ LOOP COUNT(10000)
 #ifdef _OPENMP

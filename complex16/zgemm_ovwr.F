@@ -48,7 +48,7 @@ c
 
       do i=1,m
          do j=1,n
-            C(i,j) = dcmplx(0d0,0d0)
+            C(i,j) = cmplx(0d0,0d0,Kind=Kind(0d0))
          enddo
       enddo
       do l=1,k
@@ -73,8 +73,8 @@ c
       do l=1,blksz
          do j=1,blksz
             do i=1,blksz
-               C(i,j) = dcmplx(dreal(A(i,l))*B(j,l)+dreal(C(i,j)),
-     c              dimag(A(i,l))*B(j,l)+dimag(C(i,j)))
+               C(i,j) = cmplx(real(A(i,l))*B(j,l)+real(C(i,j)),
+     c              aimag(A(i,l))*B(j,l)+aimag(C(i,j)), Kind=Kind(0d0))
             enddo
          enddo
       enddo
@@ -119,7 +119,7 @@ c
                   if (lblk.eq.1) then
                      do j=jblk,jblk+blksz-1
                         do i=iblk,iblk+blksz-1
-                           C(i,j) = dcmplx(0d0,0d0)
+                           C(i,j) = cmplx(0d0,0d0,Kind=Kind(0d0))
                         enddo
                      enddo
                   endif
@@ -132,7 +132,7 @@ c
                if (lblk.eq.1) then
                   do j=jblk,jblk+blksz-1
                      do i=iblk,m
-                        C(i,j) = dcmplx(0d0,0d0)
+                        C(i,j) = cmplx(0d0,0d0,Kind=Kind(0d0))
                      enddo
                   enddo
                endif
@@ -140,9 +140,10 @@ c
                   do j=jblk,jblk+blksz-1
                      btmp = B(j,l)
                      do i=iblk,m
-                        C(i,j) =  dcmplx(
-     c                       dreal(A(i,l))*btmp+dreal(C(i,j)),
-     c                       dimag(A(i,l))*btmp+dimag(C(i,j)))
+                        C(i,j) =  cmplx(
+     c                       real(A(i,l))*btmp+real(C(i,j)),
+     c                       aimag(A(i,l))*btmp+aimag(C(i,j)),
+     c                    Kind=Kind(0d0))
                      enddo
                   enddo
                enddo
@@ -153,7 +154,7 @@ c
             if (lblk.eq.1) then
                do j=jblk,n
                   do i=1,m
-                     C(i,j) = dcmplx(0d0,0d0)
+                     C(i,j) = cmplx(0d0,0d0,Kind=Kind(0d0))
                   enddo
                enddo
             endif
@@ -161,9 +162,10 @@ c
                do j=jblk,n
                   btmp = B(j,l)
                   do i=1,m
-                     C(i,j) =  dcmplx(
-     c                    dreal(A(i,l))*btmp+dreal(C(i,j)),
-     c                    dimag(A(i,l))*btmp+dimag(C(i,j)))
+                     C(i,j) =  cmplx(
+     c                    real(A(i,l))*btmp+real(C(i,j)),
+     c                    aimag(A(i,l))*btmp+aimag(C(i,j)),
+     c                    Kind=Kind(0d0))
                   enddo
                enddo
             enddo 
@@ -175,7 +177,7 @@ c
             if (l.eq.1) then
                do j=1,n
                   do i=1,m
-                     C(i,j) = dcmplx(0d0,0d0)
+                     C(i,j) = cmplx(0d0,0d0,Kind=Kind(0d0))
                   enddo
                enddo      
             endif
@@ -184,27 +186,30 @@ c
                   do j=jblk,jblk+blksz-1
                      btmp = B(j,l)
                      do i=iblk,iblk+blksz-1
-                     C(i,j) =  dcmplx(
-     c                    dreal(A(i,l))*btmp+dreal(C(i,j)),
-     c                    dimag(A(i,l))*btmp+dimag(C(i,j)))
+                     C(i,j) =  cmplx(
+     c                    real(A(i,l))*btmp+real(C(i,j)),
+     c                    aimag(A(i,l))*btmp+aimag(C(i,j)),
+     c                    Kind=Kind(0d0))
                      enddo
                   enddo
                enddo
                do j=jblk,jblk+blksz-1
                   btmp = B(j,l)
                   do i=iblk,m
-                     C(i,j) =  dcmplx(
-     c                    dreal(A(i,l))*btmp+dreal(C(i,j)),
-     c                    dimag(A(i,l))*btmp+dimag(C(i,j)))
+                     C(i,j) =  cmplx(
+     c                    real(A(i,l))*btmp+real(C(i,j)),
+     c                    aimag(A(i,l))*btmp+aimag(C(i,j)),
+     c                    Kind=Kind(0d0))
                   enddo
                enddo               
             enddo
             do j=jblk,n
                btmp = B(j,l)
                do i=1,m
-                      C(i,j) =  dcmplx(
-     c                    dreal(A(i,l))*btmp+dreal(C(i,j)),
-     c                    dimag(A(i,l))*btmp+dimag(C(i,j)))
+                      C(i,j) =  cmplx(
+     c                    real(A(i,l))*btmp+real(C(i,j)),
+     c                    aimag(A(i,l))*btmp+aimag(C(i,j)),
+     c                    Kind=Kind(0d0))
                enddo
             enddo
          enddo
@@ -217,7 +222,7 @@ c
             do jblk=1,n-blksz+1,blksz
                do j=1,blksz
                   do i=1,blksz
-                     CC(i,j) = dcmplx(0d0,0d0)
+                     CC(i,j) = cmplx(0d0,0d0,Kind=Kind(0d0))
                   enddo
                enddo
                do j=1,blksz
@@ -235,7 +240,7 @@ c
             enddo
             do j=jblk,n
                do i=iblk,iblk+blksz-1
-                  C(i,j) = dcmplx(0d0,0d0)
+                  C(i,j) = cmplx(0d0,0d0,Kind=Kind(0d0))
                enddo
             enddo
 c     
@@ -251,7 +256,7 @@ c
          enddo
          do j=1,n
             do i=iblk,m
-               C(i,j) = dcmplx(0d0,0d0)
+               C(i,j) = cmplx(0d0,0d0,Kind=Kind(0d0))
             enddo
          enddo
 c     
