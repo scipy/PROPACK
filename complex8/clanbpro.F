@@ -401,7 +401,6 @@ c     %-----------------------------------------------%
 c     | Check whether an invariant subspace was found |
 c     %-----------------------------------------------% 
          if (alpha .lt. anorm*epsn .and. j.lt.k) then
-            print *,'UNVARIANT SUBSPACE, alpha small'
             rnorm = alpha
             alpha = zero
 c     %------------------------------------------------%
@@ -547,7 +546,6 @@ c     %-----------------------------------------------%
 c     | Check whether an invariant subspace was found |
 c     %-----------------------------------------------%
          if (beta .lt. anorm*epsn .and. j.lt.k) then
-            print *,'UNVARIANT SUBSPACE, beta small'
             rnorm = beta
             beta = zero
 c     %-----------------------------------------------%
