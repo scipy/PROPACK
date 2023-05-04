@@ -118,7 +118,6 @@ c     | Local variables |
 c     %-----------------%
       integer i,j,dj,jold,ibnd,ib,ib1,iwrk,ierr,ip,iq,neig,lwrk,lapinfo
       double precision eps,eps34,epsn2,epsn,sfmin,anorm,rnorm,tol
-      real t0,t1,t2,t3
 
 c     %----------------------%
 c     | External Subroutines |
@@ -136,11 +135,6 @@ c     %--------------------%
 
 c-------------------- Here begins executable code ---------------------
       
-c     %-------------%
-c     | Start timer |
-c     %-------------%
-      call second(t0)
-
 c     %---------------------------------%
 c     | Set machine dependent constants |
 c     %---------------------------------%
@@ -209,13 +203,10 @@ c     %---------------------------------------------%
          call dcopy(2*lanmax, work(ib),1,work(ib1),1)
          call dzero(j+1,work(ibnd),1)
          
-         call second(t2)
          call dbdqr((j.eq.min(m,n)),'N',j,work(ib1),work(ib1+lanmax),
      c        work(ibnd+j-1),work(ibnd+j),work(ip),lanmax+1)
          call dbdsqr('u',j,0,1,0,work(ib1),work(ib1+lanmax),work,1,
      c        work(ibnd),1,work,1,work(iwrk),lapinfo)
-         call  second(t3)
-         tbsvd = tbsvd + (t3-t2)
          nbsvd = nbsvd + 1
 
          if (j.gt.5) then
@@ -307,6 +298,4 @@ c         print *,'computing vectors: neig = ',neig,' jold = ',jold
       endif
       k = neig
       nlandim = j
-      call second(t1)
-      tlansvd = t1-t0
       end

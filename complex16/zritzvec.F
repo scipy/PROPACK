@@ -70,7 +70,6 @@ c     %-----------------%
       integer lwrk, mstart
       integer i,j,ip,iqt,imt,iwrk,id(1),info
       double precision c1,c2,dd(1)
-      real t0,t1
       integer st,cnk,wst,wcnk, tid, nt
 
 c     %--------------------%
@@ -94,16 +93,6 @@ c     | 2. Compute the SVD of the k-by-k upper bidiagonal matrix
 c     |    R = P*S*Q^T. The SVD of B is then (M*P)*S*Q^T.
 c     %----------------------------------------------------------------------%
 
-
-      call second(t0)
-
-c      print *,'U = '
-c      print *,((U(i,j),i=1,m),j=1,dim+1)
-c      print *,'V = '
-c      print *,((V(i,j),i=1,n),j=1,dim)
-c      print *,'D = ',(D(i),i=1,dim)
-c      print *,'E = ',(E(i),i=1,dim)
-
 c     %-----------------------------------------%
 c     | Set pointers into workspace array
 c     %-----------------------------------------%
@@ -118,15 +107,7 @@ c     %-----------------------------------------%
 c     | Compute QR-factorization
 c     |   B = M * [R; 0]
 c     %-----------------------------------------%
-c      print *,'info = ',info
-
       call dbdqr((dim.eq.min(m,n)),jobu,dim,D,E,c1,c2,work(imt),dim+1)
-
-c      print *,'D = ',(D(i),i=1,dim)
-c      print *,'E = ',(E(i),i=1,dim)
-c      print *,'M^T = '
-c      print *,(work(imt+i-1),i=1,(dim+1)*(dim+1))
-
 
 c     %-----------------------------------------%
 c     | Compute SVD of R:
@@ -135,14 +116,6 @@ c     | using the Divide-and-conquer SVD
 c     %-----------------------------------------%
       call dbdsdc('u','I',dim,D,E,work(ip),dim,work(iqt),dim,dd,id,
      c     work(iwrk),iwork,info)
-
-c      print *,'P = '
-c      print *,(work(ip-1+i),i=1,dim*dim)
-
-c      print *,'Q^T = '
-c      print *,(work(iqt-1+i),i=1,dim*dim)
-c      print *,'info = ',info
-c      print *,(D(i),i=1,dim)
 
 c     %-----------------------------------------%
 c     | Compute left singular vectors for B
@@ -162,12 +135,6 @@ c     %-----------------------------------------%
          else
             mstart = 1
          endif
-
-
-c         print *,'U = '
-c         print *,((U(i,j),i=1,m),j=1,dim+1)
-c         print *,'X = '
-c         print *,(work(imt+i-1),i=1,(dim+1)*k)
 
 #ifdef _OPENMP
 c$OMP PARALLEL private(tid,nt,cnk,st,wcnk,wst) 
@@ -192,10 +159,6 @@ c$OMP PARALLEL private(tid,nt,cnk,st,wcnk,wst)
 c$OMP END PARALLEL 
 #endif
       endif
-c      print *,'U = '
-c      print *,((U(i,j),i=1,m),j=1,k)
-
-
 
       if (lsame(jobv,'y')) then
          if (lsame(which,'s')) then
@@ -230,10 +193,5 @@ c$OMP PARALLEL private(tid,nt,cnk,st,wcnk,wst)
 c$OMP END PARALLEL 
 #endif
       endif    
-c      print *,'V = '
-c      print *,((V(i,j),i=1,n),j=1,k)
-     
-      call  second(t1)           
-      tritzvec = t1-t0
       end
       

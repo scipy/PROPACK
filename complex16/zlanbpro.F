@@ -127,7 +127,6 @@ c     %-----------------%
       complex*16 s
       double precision mumax,numax,alpha,beta,a1,b1,amax,anormest
       logical force_reorth,full_reorth
-      real t1,t2,t3
 
 c     %----------------------%
 c     | External Subroutines |
@@ -145,7 +144,6 @@ c     %--------------------%
       external dlamch,dlapy2
 
 c-------------------- Here begins executable code ---------------------
-      call second(t1)
 
 c     %---------------------------------%
 c     | Set machine dependent constants |
@@ -253,11 +251,8 @@ c         print *,(U(i,1),i=1,m)
          iwork(iidx+2) = k0+1
 
          call pzdscal(m,rnorm,U(1,k0+1),1)
-         call second(t2)         
          call zreorth(m,k0,U,ldu,U(1,k0+1),rnorm,iwork(iidx),kappa,
      c        zwork(is),ioption(1))
-         call second(t3)
-         treorthu = treorthu+(t3-t2)         
          call zsafescal(m,rnorm,U(1,k0+1))
          call dset_mu(k0,dwork(imu),iwork(iidx),epsn2)         
          call dset_mu(k0,dwork(inu),iwork(iidx),epsn2)         
@@ -299,10 +294,7 @@ c     %-------------------------------------------%
 c     %---------------------------------------------%
 c     | alpha_{j} v_{j} = A'*u_{j} - beta_{j} v_{j} |
 c     %---------------------------------------------%
-         call second(t2)
          call aprod('c',m,n,U(1,j),V(1,j),zparm,iparm)
-         call second(t3)
-         tmvopx = tmvopx + (t3-t2)
          nopx = nopx+1
 
 c         print *,'V1 = '
@@ -323,7 +315,6 @@ c            print *,'alpha = ',alpha
 c     %------------------------------------%
 c     | Extended local reorthogonalization |
 c     %------------------------------------%
-            call second(t2)
             if (j.gt.1 .and. ioption(2).gt.0 .and.
      c           alpha.lt.kappa*beta) then
                do i=1,ioption(2)
@@ -338,8 +329,6 @@ c                  print *, 'nrm = ',nrm
  10            dwork(inu+j-2) = eps
                alpha = nrm
             endif
-            call second(t3)
-            telrv = telrv + (t3-t2)
 
             B(j,1) = alpha
             amax = max(amax,alpha)
@@ -382,11 +371,8 @@ c            print *,'***REORTH***'
             else if (.not. force_reorth) then
                call dcompute_int(dwork(inu),j-1,delta,eta,iwork(iidx))
             endif
-            call second(t2)
             call zreorth(n,j-1,V,ldv,V(1,j),alpha,iwork(iidx),
      c           kappa,zwork(is),ioption(1))
-            call second(t3)
-            treorthv = treorthv+(t3-t2)
 
             call dset_mu(j-1,dwork(inu),iwork(iidx),eps)
             numax = eta
@@ -453,10 +439,7 @@ c         print *,(V(i,j),i=1,m)
 c     %------------------------------------------------%
 c     | beta_{j+1} u_{j+1} = A*v_{j} - alpha_{j} u_{j} |
 c     %------------------------------------------------%
-         call second(t2)
          call aprod('n',m,n,V(1,j),U(1,j+1),zparm,iparm)
-         call second(t3)
-         tmvopx = tmvopx + (t3-t2)
          nopx = nopx+1
 
          call pzdaxpy(m,-alpha,U(1,j),1,U(1,j+1),1)
@@ -466,7 +449,6 @@ c         print *,'beta = ',beta
 c     %------------------------------------%
 c     | Extended local reorthogonalization |
 c     %------------------------------------%
-         call second(t2)
          if (ioption(2).gt.0 .and. beta.lt.kappa*alpha) then
             do i=1,ioption(2)
                s = pzdotc(m,U(1,j),1,U(1,j+1),1)
@@ -480,8 +462,6 @@ c               print *,'nrm = ',nrm
  20         dwork(imu+j-1) = eps
             beta = nrm
          endif
-         call second(t3)
-         telru = telru + (t3-t2)
 
 c         print *,'beta = ',beta
 
@@ -528,11 +508,8 @@ c     %--------------------------------------%
                enddo
             endif
  
- 25         call second(t2)        
-            call zreorth(m,j,U,ldu,U(1,j+1),beta,iwork(iidx),
+ 25         call zreorth(m,j,U,ldu,U(1,j+1),beta,iwork(iidx),
      c              kappa, zwork(is),ioption(1))
-            call second(t3)
-            treorthu = treorthu+(t3-t2)
 
             call dset_mu(j,dwork(imu),iwork(iidx),eps)
             mumax = eta
@@ -589,11 +566,8 @@ c     %------------------------------------------------%
             call zsafescal(m,beta,U(1,j+1))
          endif
          rnorm = beta
-         call second(t2)
       enddo
  9999 doption(3) = anorm      
-      call second(t2)
-      tlanbpro = tlanbpro + (t2-t1)
       return
       end
 
@@ -641,9 +615,7 @@ c     %-----------------%
 c     | Local variables |
 c     %-----------------%
       integer i,k,s,ip
-      real t1,t2
 
-      call second(t1)
       if (delta.lt.eta) then
          write (*,*) 'Warning delta<eta in dcompute_int'
          return
@@ -672,8 +644,6 @@ c     find smallest i<k such that for all j=i,..,k, m(j) >= eta
       enddo
  40   ip = ip+1
       index(ip) = j+1
-      call second(t2)
-      tintv = tintv + (t2-t1)
       end
 c
 c**********************************************************************
@@ -699,7 +669,6 @@ c     | Local variables |
 c     %-----------------%
       double precision d
       integer k
-      real t1,t2
       
 c     %--------------------%
 c     | External Functions |
@@ -707,7 +676,6 @@ c     %--------------------%
       double precision dlamch,dlapy2
       external dlamch,dlapy2
 
-      call second(t1)
       if (j.eq.1) then
          d = eps1*(dlapy2(alpha(j), beta(j)) + alpha(1)) + eps1*anorm
          mu(1) = eps1/beta(1)
@@ -731,8 +699,6 @@ c     %--------------------%
          mumax = max(mumax,abs(mu(j)))
       endif
       mu(j+1) = one
-      call second(t2)
-      tupdmu = tupdmu + (t2-t1)
       end
 c
 c**********************************************************************
@@ -759,7 +725,6 @@ c     | Local variables |
 c     %-----------------%
       double precision d
       integer k
-      real t1,t2
 
 c     %--------------------%
 c     | External Functions |
@@ -767,7 +732,6 @@ c     %--------------------%
       double precision dlamch,dlapy2
       external dlamch,dlapy2
 
-      call second(t1)
       if (j.gt.1) then
          numax = zero
          do k=1,j-1
@@ -779,6 +743,4 @@ c     %--------------------%
          enddo
          nu(j) = one
       endif
-      call second(t2)
-      tupdnu = tupdnu + (t2-t1)
       end

@@ -68,7 +68,6 @@ c     | Local variables |
 c     %-----------------%
       integer itry
       double precision normvnew_0
-      real t2,t3
       
 c     %----------------------%
 c     | External Subroutines |
@@ -82,8 +81,6 @@ c     %--------------------%
       external pdznrm2,pzzero
 
       if (k.le.0 .or. n.le.0) return
-
-      call second(t2)
 
       do itry=1,NTRY
          normvnew_0 = normvnew         
@@ -99,9 +96,7 @@ c     %--------------------%
       normvnew = 0d0
 c     vnew is numerically in span(V) => return vnew = (0,0,...,0)^T
       call pzzero(n,vnew,1)
- 9999 call second(t3)
-      treorth = treorth + (t3-t2)
-      nreorth = nreorth + 1
+ 9999 nreorth = nreorth + 1
       return
       end
 c

@@ -34,7 +34,6 @@ c     | Local variables |
 c     %-----------------%
       integer itry,idist,iseed(4),rsize,usize,index(3)
       real nrm
-      real t1,t2,t3
 
 c     %--------------------%
 c     | External Functions |
@@ -45,7 +44,6 @@ c     %--------------------%
 
 c-------------------- Here begins executable code ---------------------
 
-      call second(t1)
       iseed(1) = 1
       iseed(2) = 3
       iseed(3) = 5
@@ -70,10 +68,7 @@ c     %-------------------------%
       do itry=1,ntry
          call clarnv(idist, iseed, rsize, work)
          nrm = pscnrm2(rsize,work,1)
-         call second(t2)
          call aprod(transa,m,n,work,u0,dparm,iparm)
-         call second(t3)
-         tmvopx = tmvopx + (t3-t2)
          nopx = nopx+1
 
          u0norm = pscnrm2(usize,u0,1)
@@ -90,8 +85,6 @@ c     %-------------------------%
          if (u0norm.gt.0) goto 9999
       enddo
       ierr = -1
- 9999 call second(t2)
-      tgetu0 = tgetu0 + (t2-t1)
-      return
+ 9999 return
       end
       

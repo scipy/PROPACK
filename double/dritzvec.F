@@ -75,7 +75,6 @@ c     %-----------------%
       integer lwrk, mstart
       integer ip,iqt,imt,iwrk,id(1),info
       double precision c1,c2,dd(1)
-      real t0,t1
       integer st,cnk,wst,wcnk, tid, nt
 
 c     %--------------------%
@@ -99,8 +98,6 @@ c     | 2. Compute the SVD of the k-by-k upper bidiagonal matrix
 c     |    R = P*S*Q^T. The SVD of B is then (M*P)*S*Q^T.
 c     %----------------------------------------------------------------------%
 
-
-      call second(t0)
 
 c     %-----------------------------------------%
 c     | Set pointers into workspace array
@@ -199,8 +196,5 @@ c$OMP PARALLEL private(tid,nt,cnk,st,wcnk,wst)
 c$OMP END PARALLEL 
 #endif
       endif    
-      
-      call  second(t1)           
-      tritzvec = t1-t0
       end
       
