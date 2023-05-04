@@ -135,7 +135,6 @@ c     %-----------------%
       integer ialpha,ibeta,ialpha1,ibeta1,ishift,nshft,lapinfo
       double precision eps,eps34,epsn2,epsn,sfmin,anorm,rnorm,tol
       double precision shift, relgap
-      real t0,t1,t2,t3
       integer st,cnk,wst,wcnk, tid, nt
 
 c     %----------------------%
@@ -157,11 +156,6 @@ c     %--------------------%
 
 c-------------------- Here begins executable code ---------------------
       
-c     %-------------%
-c     | Start timer |
-c     %-------------%
-      call second(t0)
-
 c     %---------------------------------%
 c     | Set machine dependent constants |
 c     %---------------------------------%
@@ -229,15 +223,12 @@ c     %---------------------------------------------%
          call dcopy(dim, work(ibeta),1,work(ibeta1),1)
          call dzero(dim+1,work(ibnd),1)
 
-         call second(t2)
          call dbdqr((dim.eq.min(m,n)),'N',dim,work(ialpha1),
      c        work(ibeta1),work(ibnd+dim-1),work(ibnd+dim),
      c        work(ip),dim+1)
          
          call dbdsqr('u',dim,0,1,0,work(ialpha1),work(ibeta1),work,1,
      c        work(ibnd),1,work,1,work(iwrk),lapinfo)
-         call  second(t3)
-         tbsvd = tbsvd + (t3-t2)
          nbsvd = nbsvd + 1
 
          if (dim.gt.5) then
@@ -326,7 +317,6 @@ c     |                                                                     |
 c     | We use exact shifts mu_i for which the relative gap between mu_i    |
 c     | and the lower bound on the k'th Ritzvalue is larger than doption(4) |
 c     %---------------------------------------------------------------------%
-            call second(t2)
             call dzero(dim-k,work(ishift),1)
             nshft = 0
             if (lsame(which,'s')) then
@@ -409,8 +399,6 @@ c$OMP PARALLEL private(tid,nt,cnk,st,wcnk,wst)
 c$OMP END PARALLEL
 #endif
             rnorm = work(ibeta+k-1)
-            call second(t3)
-            trestart = trestart + (t3-t2)
             nrestart = nrestart + 1
          endif         
          iter = iter + 1
@@ -430,6 +418,4 @@ c     %-----------------------------------------%
       endif
       neig = nconv
       nlandim = dim
-      call second(t1)
-      tlansvd = t1-t0
       end
