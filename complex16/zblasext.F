@@ -319,48 +319,21 @@ c
       implicit none
       integer n, incx, incy
       complex*16 x(*),y(*)
-#ifndef __APPLE__
-      complex*16 zdotc
-      external zdotc
+      complex*16 wzdotc
+      external wzdotc
 
-      pzdotc = zdotc(n, x , incx, y, incy)
-#else
-      integer i
-      pzdotc = (0.0,0.0)
-      if (incx.eq.1 .and. incy.eq.1) then
-         do i=1,n
-            pzdotc = pzdotc + conjg(x(i))*y(i)
-         enddo
-      else
-         do i=1,n
-            pzdotc = pzdotc + conjg(x(1+(i-1)*incx))*y(1+(i-1)*incy)
-         enddo
-      endif
-#endif      
+      pzdotc = wzdotc(n, x , incx, y, incy)    
       end
 
       complex*16 function pzdotu(n, x , incx, y, incy)
       implicit none
       integer n, incx, incy
       complex*16 x(*),y(*)
-#ifndef __APPLE__
-      complex*16 zdotu
-      external zdotu
+
+      complex*16 wzdotu
+      external wzdotu
       
-      pzdotu = zdotu(n, x , incx, y, incy)
-#else
-      integer i
-      pzdotu = (0.0,0.0)
-      if (incx.eq.1 .and. incy.eq.1) then
-         do i=1,n
-            pzdotu = pzdotu + x(i)*y(i)
-         enddo
-      else
-         do i=1,n
-            pzdotu = pzdotu + x(1+(i-1)*incx)*y(1+(i-1)*incy)
-         enddo
-      endif
-#endif
+      pzdotu = wzdotu(n, x , incx, y, incy)
       end
 #endif
 
