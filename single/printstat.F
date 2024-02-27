@@ -34,7 +34,7 @@ c
       
       subroutine printstat
       implicit none
-      include 'stat.h'
+      INCLUDE 'stat.h'
 
       print *,'+---------------------------------------------------',
      c     '--------+'

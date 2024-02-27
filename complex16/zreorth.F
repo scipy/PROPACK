@@ -166,8 +166,8 @@ c     Classical Gram-Schmidt: vnew = vnew - V(:,p:q)*(V(:,p:q)'*vnew)
             if (tid.eq.nt-1) then
                cnk = n-st+1
             endif
-            call zgemv('C',cnk,l,dcmplx(1d0,0d0),V(st,p),ld,vnew(st),1,
-     c           dcmplx(0d0,0d0),ylocal,1)
+            call zgemv('C',cnk,l,cmplx(1d0,0d0,Kind=Kind(0d0)),V(st,p),
+     c           ld,vnew(st),1,cmplx(0d0,0d0,Kind=Kind(0d0)),ylocal,1)
 
             if (tid.eq.0) then
                do j=1,l
@@ -191,8 +191,8 @@ c$OMP END CRITICAL
 #ifdef _OPENMP
 c$OMP BARRIER
 #endif
-            call zgemv('N',cnk,l,dcmplx(-1d0,0d0),V(st,p),ld,work,1,
-     c           dcmplx(0d0,0d0),ylocal,1)
+            call zgemv('N',cnk,l,cmplx(-1d0,0d0,Kind=Kind(0d0)),V(st,p),
+     c           ld,work,1,cmplx(0d0,0d0,Kind=Kind(0d0)),ylocal,1)
             do j=1,cnk
                vnew(st+j-1) = vnew(st+j-1) + ylocal(j)
             enddo

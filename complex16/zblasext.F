@@ -423,14 +423,14 @@ c
 c$OMP PARALLEL DO  schedule(static)
 #endif
             do i=1,n
-               y(i) = dcmplx(zero,zero)
+               y(i) = cmplx(zero,zero,Kind=Kind(0d0))
             enddo
          else
 #ifdef _OPENMP
 c$OMP PARALLEL DO firstprivate(incy) schedule(static)
 #endif
             do i=1,n
-               y(1+(i-1)*incy) = dcmplx(zero,zero)
+               y(1+(i-1)*incy) = cmplx(zero,zero,Kind=Kind(0d0))
             enddo
          endif
          
@@ -503,31 +503,31 @@ c
       complex*16 alpha,beta,x(n),y(n)
 
       if (n.le.0 .or. incy.eq.0 .or. incx.eq.0) return
-      if (alpha.eq.dcmplx(zero,zero) .and. 
-     c     beta.eq.dcmplx(zero,zero)) then
+      if (alpha.eq.cmplx(zero,zero,Kind=Kind(0d0)) .and. 
+     c     beta.eq.cmplx(zero,zero,Kind=Kind(0d0))) then
          if (incy.eq.1) then
 #ifdef _OPENMP
 c$OMP PARALLEL DO  schedule(static)
 #endif
             do i=1,n
-               y(i) = dcmplx(zero,zero)
+               y(i) = cmplx(zero,zero,Kind=Kind(0d0))
             enddo
          else
 #ifdef _OPENMP
 c$OMP PARALLEL DO firstprivate(incy) schedule(static)
 #endif
             do i=1,n
-               y(1+(i-1)*incy) = dcmplx(zero,zero)
+               y(1+(i-1)*incy) = cmplx(zero,zero,Kind=Kind(0d0))
             enddo
          endif
          
-      else if (alpha.eq.dcmplx(zero,zero) .and. 
-     c        beta.ne.dcmplx(zero,zero)) then
+      else if (alpha.eq.cmplx(zero,zero,Kind=Kind(0d0)).and. 
+     c        beta.ne.cmplx(zero,zero,Kind=Kind(0d0))) then
          
          call pzscal(n,beta,y,incy)
 
-      else if (alpha.ne.dcmplx(zero,zero) .and. 
-     c        beta.eq.dcmplx(zero,zero)) then
+      else if (alpha.ne.cmplx(zero,zero,Kind=Kind(0d0)) .and. 
+     c        beta.eq.cmplx(zero,zero,Kind=Kind(0d0))) then
 
          if (alpha.eq.one) then
             call pzcopy(n,x,incx,y,incy)
@@ -596,24 +596,24 @@ c
       complex*16 alpha,x(n),y(n)
 
       if (n.le.0 .or. incy.eq.0 .or. incx.eq.0) return
-      if (alpha.eq.dcmplx(zero,zero)) then
+      if (alpha.eq.cmplx(zero,zero,Kind=Kind(0d0))) then
          if (incy.eq.1) then
 #ifdef _OPENMP
 c$OMP PARALLEL DO schedule(static)
 #endif
            do i=1,n
-               y(i) = dcmplx(zero,zero)
+               y(i) = cmplx(zero,zero,Kind=Kind(0d0))
             enddo
          else
 #ifdef _OPENMP
 c$OMP PARALLEL DO firstprivate(incy) schedule(static)
 #endif
            do i=1,n
-               y(1+(i-1)*incy) = dcmplx(zero,zero)
+               y(1+(i-1)*incy) = cmplx(zero,zero,Kind=Kind(0d0))
             enddo
          endif
          
-      else if (alpha.ne.dcmplx(zero,zero)) then
+      else if (alpha.ne.cmplx(zero,zero,Kind=Kind(0d0))) then
 
          if (alpha.eq.one) then
             if (incx.eq.1 .and. incy.eq.1) then
@@ -674,14 +674,14 @@ c
 c$OMP PARALLEL DO schedule(static)
 #endif
            do i=1,n
-               y(i) = dcmplx(zero,zero)
+               y(i) = cmplx(zero,zero,Kind=Kind(0d0))
             enddo
          else
 #ifdef _OPENMP
 c$OMP PARALLEL DO firstprivate(incy) schedule(static)
 #endif
            do i=1,n
-               y(1+(i-1)*incy) = dcmplx(zero,zero)
+               y(1+(i-1)*incy) = cmplx(zero,zero,Kind=Kind(0d0))
             enddo
          endif
          
@@ -741,11 +741,11 @@ c
       if ((n.gt.0).and.(incx.ne.0)) then         
          if (incx.eq.1) then
             do i=1,n
-               x(i) = dcmplx(0d0,0d0)
+               x(i) = cmplx(0d0,0d0,Kind=Kind(0d0))
             enddo
          else
             do i=1,n
-               x(1+(i-1)*incx) = dcmplx(0d0,0d0)
+               x(1+(i-1)*incx) = cmplx(0d0,0d0,Kind=Kind(0d0))
             enddo
          endif
       endif
