@@ -319,46 +319,19 @@ c
       implicit none
       integer n, incx, incy
       complex x(*),y(*)
-#ifndef __APPLE__
-      complex cdotc
-      external cdotc
-      pcdotc = cdotc(n, x , incx, y, incy)
-#else
-      integer i
-      pcdotc = (0.0,0.0)
-      if (incx.eq.1 .and. incy.eq.1) then
-         do i=1,n
-            pcdotc = pcdotc + conjg(x(i))*y(i)
-         enddo
-      else
-         do i=1,n
-            pcdotc = pcdotc + conjg(x(1+(i-1)*incx))*y(1+(i-1)*incy)
-         enddo
-      endif
-#endif
+      complex wcdotc
+      external wcdotc
+      pcdotc = wcdotc(n, x , incx, y, incy)
       end
 
       complex function pcdotu(n, x , incx, y, incy)
       implicit none
       integer n, incx, incy
       complex x(*),y(*)
-#ifndef __APPLE__
-      complex cdotu
-      external cdotu
-      pcdotu = cdotu(n, x , incx, y, incy)
-#else
-      integer i
-      pcdotu = (0.0,0.0)
-      if (incx.eq.1 .and. incy.eq.1) then
-         do i=1,n
-            pcdotu = pcdotu + x(i)*y(i)
-         enddo
-      else
-         do i=1,n
-            pcdotu = pcdotu + x(1+(i-1)*incx)*y(1+(i-1)*incy)
-         enddo
-      endif
-#endif
+      
+      complex wcdotu
+      external wcdotu
+      pcdotu = wcdotu(n, x , incx, y, incy)
       end
 #endif
 
@@ -777,34 +750,3 @@ c
       return
       end
 
-#ifdef BLAH
-      complex function cdotc(n, cx, incx, cy, incy)
-      complex cx(*), cy(*), c
-      integer n, incx, incy
-
-      call cblas_cdotc_sub(%val(n), cx, %val(incx), cy, %val(incy), c)
-
-      cdotc = c
-      return
-      end
-
-      complex function cdotu(n, cx, incx, cy, incy)
-      complex cx(*), cy(*), c
-      integer n, incx, incy
-
-      call cblas_cdotu_sub(%val(n), cx, %val(incx), cy, %val(incy), c)
-
-      cdotu = c
-      return
-      end
-#endif
-
-#ifdef SCIPY_USE_G77_CDOTC_WRAP
-      complex function cdotc(n, cx, incx, cy, incy)
-      complex cx(*), cy(*), c
-      integer n, incx, incy
-      call WCDOTC(n, cx, incx, cy, incy)
-      cdotc = c
-      return
-      end
-#endif
