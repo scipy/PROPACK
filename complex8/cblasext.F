@@ -323,9 +323,9 @@ c     modified 12/3/93, array(1) declarations changed to array(*)
 c
       complex zx(*),zy(*),ztemp
       integer incx,incy,ix,iy,n
-      complex zzdotc
-      external zzdotc
-      pcdotc = zzdotc(n, zx, incx, zy, incy)
+      complex ccdotc
+      external ccdotc
+      pcdotc = ccdotc(n, zx, incx, zy, incy)
       end
 
       complex function pcdotu(n, x , incx, y, incy)
