@@ -7,11 +7,11 @@ c
       implicit none
       integer n, incx
       complex*16 x(*)
-      
+
       integer i
       double precision sum
 
-      if ((n.gt.0).and.(incx.ne.0)) then    
+      if ((n.gt.0).and.(incx.ne.0)) then
          sum = 0d0
          if (incx.eq.1) then
 c$OMP PARALLEL DO  reduction(+:sum) schedule(static)
@@ -27,20 +27,20 @@ c$OMP PARALLEL DO firstprivate(incx) reduction(+:sum) schedule(static)
          pdznrm2 = sqrt(sum)
       else
          pdznrm2 = 0d0
-      endif   
+      endif
       return
       end
 c
 c****************************************************************************
-c 
+c
       subroutine pzscal(n, alpha, x , incx)
       implicit none
       integer n, incx
       complex*16 alpha,x(*)
-      
+
       integer i
 
-      if ((n.gt.0).and.(incx.ne.0)) then         
+      if ((n.gt.0).and.(incx.ne.0)) then
          if (incx.eq.1) then
 c$OMP PARALLEL DO firstprivate(alpha) schedule(static)
             do i=1,n
@@ -62,10 +62,10 @@ c$OMP PARALLEL DO firstprivate(alpha, incx) schedule(static)
       integer n, incx
       double precision alpha
       complex*16 x(*)
-      
+
       integer i
 
-      if ((n.gt.0).and.(incx.ne.0)) then         
+      if ((n.gt.0).and.(incx.ne.0)) then
          if (incx.eq.1) then
 c$OMP PARALLEL DO firstprivate(alpha) schedule(static)
             do i=1,n
@@ -80,18 +80,18 @@ c$OMP PARALLEL DO firstprivate(alpha, incx) schedule(static)
       endif
       return
       end
-      
+
 c
 c****************************************************************************
-c 
+c
       subroutine pzcopy(n, x , incx, y, incy)
       implicit none
       integer n, incx, incy
       complex*16 x(*),y(*)
-      
+
       integer i
 
-      if ((n.gt.0).and.(incx.ne.0).and.(incy.ne.0)) then         
+      if ((n.gt.0).and.(incx.ne.0).and.(incy.ne.0)) then
          if (incx.eq.1 .and. incy.eq.1) then
 c$OMP PARALLEL DO  schedule(static)
             do i=1,n
@@ -109,15 +109,15 @@ c$OMP PARALLEL DO firstprivate(incx, incy) schedule(static)
 
 c
 c****************************************************************************
-c 
+c
       subroutine pzaxpy(n, alpha, x , incx, y, incy)
       implicit none
       integer n, incx, incy
       complex*16 alpha,x(*),y(*)
-      
+
       integer i
 
-      if ((n.gt.0).and.(incx.ne.0).and.(incy.ne.0)) then         
+      if ((n.gt.0).and.(incx.ne.0).and.(incy.ne.0)) then
          if (incx.eq.1 .and. incy.eq.1) then
 c$OMP PARALLEL DO firstprivate(alpha)  schedule(static)
            do i=1,n
@@ -126,7 +126,7 @@ c$OMP PARALLEL DO firstprivate(alpha)  schedule(static)
          else
 c$OMP PARALLEL DO firstprivate(alpha,incx,incy) schedule(static)
             do i=1,n
-               y(1+(i-1)*incy) = alpha*x(1+(i-1)*incx) + 
+               y(1+(i-1)*incy) = alpha*x(1+(i-1)*incx) +
      c              y(1+(i-1)*incy)
             enddo
          endif
@@ -140,10 +140,10 @@ c$OMP PARALLEL DO firstprivate(alpha,incx,incy) schedule(static)
       integer n, incx, incy
       double precision alpha
       complex*16 x(*),y(*)
-      
+
       integer i
 
-      if ((n.gt.0).and.(incx.ne.0).and.(incy.ne.0)) then         
+      if ((n.gt.0).and.(incx.ne.0).and.(incy.ne.0)) then
          if (incx.eq.1 .and. incy.eq.1) then
 c$OMP PARALLEL DO firstprivate(alpha)  schedule(static)
            do i=1,n
@@ -152,7 +152,7 @@ c$OMP PARALLEL DO firstprivate(alpha)  schedule(static)
          else
 c$OMP PARALLEL DO firstprivate(alpha,incx,incy) schedule(static)
             do i=1,n
-               y(1+(i-1)*incy) = alpha*x(1+(i-1)*incx) + 
+               y(1+(i-1)*incy) = alpha*x(1+(i-1)*incx) +
      c              y(1+(i-1)*incy)
             enddo
          endif
@@ -160,19 +160,19 @@ c$OMP PARALLEL DO firstprivate(alpha,incx,incy) schedule(static)
       return
       end
 
-      
+
 c
 c****************************************************************************
-c 
+c
       complex*16 function pzdotc(n, x , incx, y, incy)
       implicit none
       integer n, incx, incy
       complex*16 x(*),y(*)
-      
+
       integer i
       complex*16 sum
 
-      if ((n.gt.0).and.(incx.ne.0).and.(incy.ne.0)) then    
+      if ((n.gt.0).and.(incx.ne.0).and.(incy.ne.0)) then
          if (incx.eq.1 .and. incy.eq.1) then
             sum = (0d0,0d0)
 c$OMP PARALLEL DO reduction(+:sum) schedule(static)
@@ -181,8 +181,8 @@ c$OMP PARALLEL DO reduction(+:sum) schedule(static)
             enddo
          else
             sum = (0d0,0d0)
-c$OMP PARALLEL DO firstprivate(incx, incy) reduction(+:sum) 
-c$OMP& schedule(static) 
+c$OMP PARALLEL DO firstprivate(incx, incy) reduction(+:sum)
+c$OMP& schedule(static)
             do i=1,n
                sum = sum + dconjg(x(1+(i-1)*incx)) * y(1+(i-1)*incy)
             enddo
@@ -190,7 +190,7 @@ c$OMP& schedule(static)
          pzdotc = sum
       else
          pzdotc = (0d0,0d0)
-      endif   
+      endif
       return
       end
 
@@ -198,11 +198,11 @@ c$OMP& schedule(static)
       implicit none
       integer n, incx, incy
       complex*16 x(*),y(*)
-      
+
       integer i
       complex*16 sum
 
-      if ((n.gt.0).and.(incx.ne.0).and.(incy.ne.0)) then    
+      if ((n.gt.0).and.(incx.ne.0).and.(incy.ne.0)) then
          if (incx.eq.1 .and. incy.eq.1) then
             sum = (0d0,0d0)
 c$OMP PARALLEL DO reduction(+:sum) schedule(static)
@@ -211,8 +211,8 @@ c$OMP PARALLEL DO reduction(+:sum) schedule(static)
             enddo
          else
             sum = (0d0,0d0)
-c$OMP PARALLEL DO firstprivate(incx, incy) reduction(+:sum) 
-c$OMP& schedule(static) 
+c$OMP PARALLEL DO firstprivate(incx, incy) reduction(+:sum)
+c$OMP& schedule(static)
             do i=1,n
                sum = sum + x(1+(i-1)*incx) * y(1+(i-1)*incy)
             enddo
@@ -220,13 +220,13 @@ c$OMP& schedule(static)
          pzdotu = sum
       else
          pzdotu = (0d0,0d0)
-      endif   
+      endif
       return
       end
 
 c
 c****************************************************************************
-c 
+c
 
 #else
 
@@ -241,7 +241,7 @@ c
       end
 c
 c****************************************************************************
-c 
+c
 
 
       subroutine pzscal(n, alpha, x , incx)
@@ -254,7 +254,7 @@ c
 
 c
 c****************************************************************************
-c 
+c
 
       subroutine pzdscal(n, alpha, x , incx)
       implicit none
@@ -267,7 +267,7 @@ c
 
 c
 c****************************************************************************
-c 
+c
 
       subroutine pzcopy(n, x , incx, y, incy)
       implicit none
@@ -278,13 +278,13 @@ c
       end
 c
 c****************************************************************************
-c 
+c
 
       subroutine pzaxpy(n, alpha, x , incx, y, incy)
       implicit none
       integer n, incx, incy
       complex*16 alpha,x(*),y(*)
-     
+
       call zaxpy(n, alpha, x , incx, y, incy)
       end
 
@@ -293,17 +293,17 @@ c
       integer n, incx, incy
       double precision alpha
       complex*16 x(*),y(*)
-      
+
       integer i
 
-      if ((n.gt.0).and.(incx.ne.0).and.(incy.ne.0)) then         
+      if ((n.gt.0).and.(incx.ne.0).and.(incy.ne.0)) then
          if (incx.eq.1 .and. incy.eq.1) then
            do i=1,n
                y(i) = alpha*x(i) + y(i)
             enddo
          else
             do i=1,n
-               y(1+(i-1)*incy) = alpha*x(1+(i-1)*incx) + 
+               y(1+(i-1)*incy) = alpha*x(1+(i-1)*incx) +
      c              y(1+(i-1)*incy)
             enddo
          endif
@@ -313,16 +313,16 @@ c
 
 c
 c****************************************************************************
-c 
-      
+c
+
       complex*16 function pzdotc(n, x , incx, y, incy)
       implicit none
       integer n, incx, incy
       complex*16 x(*),y(*)
-      complex*16 wzdotc
-      external wzdotc
+      complex*16 zzdotc
+      external zzdotc
 
-      pzdotc = wzdotc(n, x , incx, y, incy)    
+      pzdotc = zzdotc(n, x , incx, y, incy)
       end
 
       complex*16 function pzdotu(n, x , incx, y, incy)
@@ -332,26 +332,26 @@ c
 
       complex*16 wzdotu
       external wzdotu
-      
+
       pzdotu = wzdotu(n, x , incx, y, incy)
       end
 #endif
 
 c
 c****************************************************************************
-c 
-         
+c
+
       subroutine pzzero(n, x , incx)
       implicit none
       integer n, incx
       complex*16 x(*)
-      
+
       integer i
 
-      if ((n.gt.0).and.(incx.ne.0)) then         
+      if ((n.gt.0).and.(incx.ne.0)) then
          if (incx.eq.1) then
 #ifdef _OPENMP
-c$OMP PARALLEL DO 
+c$OMP PARALLEL DO
 #endif
             do i=1,n
                x(i) = (0d0,0d0)
@@ -370,16 +370,16 @@ c$OMP PARALLEL DO firstprivate(incx) schedule(static)
 
 c
 c****************************************************************************
-c 
+c
 
       subroutine pzset(n, alpha, x , incx)
       implicit none
       integer n, incx
       complex*16 alpha,x(*)
-      
+
       integer i
 
-      if ((n.gt.0).and.(incx.ne.0)) then         
+      if ((n.gt.0).and.(incx.ne.0)) then
          if (incx.eq.1) then
 #ifdef _OPENMP
 c$OMP PARALLEL DO firstprivate(alpha) schedule(static)
@@ -401,13 +401,13 @@ c$OMP PARALLEL DO firstprivate(alpha, incx) schedule(static)
 
 c
 c****************************************************************************
-c 
+c
 
-  
+
       subroutine pzdaxpby(n,alpha,x,incx,beta,y,incy)
 c
 c     Y = alpha*X + beta*Y
-c     
+c
 
       implicit none
       double precision one,zero
@@ -433,9 +433,9 @@ c$OMP PARALLEL DO firstprivate(incy) schedule(static)
                y(1+(i-1)*incy) = dcmplx(zero,zero)
             enddo
          endif
-         
+
       else if (alpha.eq.zero .and. beta.ne.zero) then
-         
+
          call pzdscal(n,beta,y,incy)
 
       else if (alpha.ne.zero .and. beta.eq.zero) then
@@ -452,8 +452,8 @@ c$OMP PARALLEL DO firstprivate(alpha) schedule(static)
                enddo
             else
 #ifdef _OPENMP
-c$OMP PARALLEL DO firstprivate(incx, incy, alpha) 
-c$OMP& schedule(static) 
+c$OMP PARALLEL DO firstprivate(incx, incy, alpha)
+c$OMP& schedule(static)
 #endif
                do i=1,n
                   y(1+(i-1)*incy) = alpha*x(1+(i-1)*incx)
@@ -469,19 +469,19 @@ c DAXPY
          else
             if (incx.eq.1 .and. incy.eq.1) then
 #ifdef _OPENMP
-c$OMP PARALLEL DO firstprivate(alpha,beta) 
-c$OMP& schedule(static) 
+c$OMP PARALLEL DO firstprivate(alpha,beta)
+c$OMP& schedule(static)
 #endif
                do i=1,n
                   y(i) = alpha*x(i) + beta*y(i)
                enddo
             else
 #ifdef _OPENMP
-c$OMP PARALLEL DO firstprivate(alpha,beta,incx,incy)  
-c$OMP& schedule(static) 
+c$OMP PARALLEL DO firstprivate(alpha,beta,incx,incy)
+c$OMP& schedule(static)
 #endif
                do i=1,n
-                  y(1+(i-1)*incy) = alpha*x(1+(i-1)*incx) + 
+                  y(1+(i-1)*incy) = alpha*x(1+(i-1)*incx) +
      c                 beta*y(1+(i-1)*incy)
                enddo
             endif
@@ -494,7 +494,7 @@ c$OMP& schedule(static)
       subroutine pzaxpby(n,alpha,x,incx,beta,y,incy)
 c
 c     Y = alpha*X + beta*Y
-c     
+c
 
       implicit none
       double precision one,zero
@@ -503,7 +503,7 @@ c
       complex*16 alpha,beta,x(n),y(n)
 
       if (n.le.0 .or. incy.eq.0 .or. incx.eq.0) return
-      if (alpha.eq.dcmplx(zero,zero) .and. 
+      if (alpha.eq.dcmplx(zero,zero) .and.
      c     beta.eq.dcmplx(zero,zero)) then
          if (incy.eq.1) then
 #ifdef _OPENMP
@@ -520,13 +520,13 @@ c$OMP PARALLEL DO firstprivate(incy) schedule(static)
                y(1+(i-1)*incy) = dcmplx(zero,zero)
             enddo
          endif
-         
-      else if (alpha.eq.dcmplx(zero,zero) .and. 
+
+      else if (alpha.eq.dcmplx(zero,zero) .and.
      c        beta.ne.dcmplx(zero,zero)) then
-         
+
          call pzscal(n,beta,y,incy)
 
-      else if (alpha.ne.dcmplx(zero,zero) .and. 
+      else if (alpha.ne.dcmplx(zero,zero) .and.
      c        beta.eq.dcmplx(zero,zero)) then
 
          if (alpha.eq.one) then
@@ -541,8 +541,8 @@ c$OMP PARALLEL DO firstprivate(alpha) schedule(static)
                enddo
             else
 #ifdef _OPENMP
-c$OMP PARALLEL DO firstprivate(incx, incy, alpha) 
-c$OMP& schedule(static) 
+c$OMP PARALLEL DO firstprivate(incx, incy, alpha)
+c$OMP& schedule(static)
 #endif
                do i=1,n
                   y(1+(i-1)*incy) = alpha*x(1+(i-1)*incx)
@@ -558,19 +558,19 @@ c DAXPY
          else
             if (incx.eq.1 .and. incy.eq.1) then
 #ifdef _OPENMP
-c$OMP PARALLEL DO firstprivate(alpha,beta) 
-c$OMP& schedule(static) 
+c$OMP PARALLEL DO firstprivate(alpha,beta)
+c$OMP& schedule(static)
 #endif
                do i=1,n
                   y(i) = alpha*x(i) + beta*y(i)
                enddo
             else
 #ifdef _OPENMP
-c$OMP PARALLEL DO firstprivate(alpha,beta,incx,incy)  
-c$OMP& schedule(static) 
+c$OMP PARALLEL DO firstprivate(alpha,beta,incx,incy)
+c$OMP& schedule(static)
 #endif
                do i=1,n
-                  y(1+(i-1)*incy) = alpha*x(1+(i-1)*incx) + 
+                  y(1+(i-1)*incy) = alpha*x(1+(i-1)*incx) +
      c                 beta*y(1+(i-1)*incy)
                enddo
             endif
@@ -582,12 +582,12 @@ c$OMP& schedule(static)
 
 c
 c****************************************************************************
-c 
+c
 
       subroutine pzaxty(n,alpha,x,incx,y,incy)
 c
 c     Y = alpha*X*Y
-c     
+c
 
       implicit none
       double precision one,zero
@@ -612,7 +612,7 @@ c$OMP PARALLEL DO firstprivate(incy) schedule(static)
                y(1+(i-1)*incy) = dcmplx(zero,zero)
             enddo
          endif
-         
+
       else if (alpha.ne.dcmplx(zero,zero)) then
 
          if (alpha.eq.one) then
@@ -642,8 +642,8 @@ c$OMP PARALLEL DO firstprivate(alpha) schedule(static)
                enddo
             else
 #ifdef _OPENMP
-c$OMP PARALLEL DO firstprivate(alpha,incx,incy) 
-c$OMP& schedule(static) 
+c$OMP PARALLEL DO firstprivate(alpha,incx,incy)
+c$OMP& schedule(static)
 #endif
                do i=1,n
                   y(1+(i-1)*incy) = alpha*x(1+(i-1)*incx)*
@@ -659,7 +659,7 @@ c$OMP& schedule(static)
       subroutine pzdaxty(n,alpha,x,incx,y,incy)
 c
 c     Y = alpha*X*Y
-c     
+c
 
       implicit none
       double precision one,zero
@@ -684,7 +684,7 @@ c$OMP PARALLEL DO firstprivate(incy) schedule(static)
                y(1+(i-1)*incy) = dcmplx(zero,zero)
             enddo
          endif
-         
+
       else if (alpha.ne.zero) then
 
          if (alpha.eq.one) then
@@ -714,8 +714,8 @@ c$OMP PARALLEL DO firstprivate(alpha) schedule(static)
                enddo
             else
 #ifdef _OPENMP
-c$OMP PARALLEL DO firstprivate(alpha,incx,incy) 
-c$OMP& schedule(static) 
+c$OMP PARALLEL DO firstprivate(alpha,incx,incy)
+c$OMP& schedule(static)
 #endif
                do i=1,n
                   y(1+(i-1)*incy) = alpha*x(1+(i-1)*incx)*
@@ -730,15 +730,15 @@ c$OMP& schedule(static)
 
 c
 c****************************************************************************
-c 
-                 
+c
+
       subroutine zzero(n, x , incx)
       implicit none
       integer n, incx
       complex*16 x(*)
       integer i
 
-      if ((n.gt.0).and.(incx.ne.0)) then         
+      if ((n.gt.0).and.(incx.ne.0)) then
          if (incx.eq.1) then
             do i=1,n
                x(i) = dcmplx(0d0,0d0)
@@ -751,4 +751,3 @@ c
       endif
       return
       end
-
