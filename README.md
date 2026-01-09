@@ -1,3 +1,14 @@
+
+> [!NOTE]
+> This repository is the SciPy version of the PROPACK library that was used until version
+> 1.17.0. It has been replaced since then and the code is not maintained. For the official
+> source of the codebase see https://github.com/rmlarsen/propack
+>
+> Below is the original description for PROPACK 2.1 and also see `license.txt` for the license
+> under which SciPy used this code.
+> 
+
+```
 PROPACK Version 2.1,                              Stanford, April 2005
 
 OVERVIEW
@@ -179,3 +190,4 @@ Stanford University,  Stanford, CA 94305-4085
 E-mail: rmunk@quake.stanford.edu 
 
 (C) Rasmus Munk Larsen, Stanford University, March 2004.
+```
